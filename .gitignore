@@ -1,4 +1,4 @@
 .DS_Store
-dist/js/*
+dist/js/
 node_modules/
 .history/
