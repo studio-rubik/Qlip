@@ -37,6 +37,8 @@ function tilStyleApplied(
   });
 }
 
+const MARGIN = 20;
+
 function handleMouseOver(e: MouseEvent) {
   const elm = e.target as HTMLElement;
   savedOutline = elm.style.outline;
@@ -64,7 +66,13 @@ function handleMouseOver(e: MouseEvent) {
       outlineOffset: savedOffset,
       zIndex: savedZIndex,
     });
-    const rect = elm.getBoundingClientRect();
+    const clientRect = elm.getBoundingClientRect();
+    const rect = {
+      x: clientRect.x - MARGIN,
+      y: clientRect.y - MARGIN,
+      width: clientRect.width + MARGIN * 2,
+      height: clientRect.height + MARGIN * 2,
+    };
     chrome.runtime.sendMessage(
       {
         message: 'capture',
@@ -78,7 +86,10 @@ function handleMouseOver(e: MouseEvent) {
         const reactRoot = document.getElementById('dc-root');
         reactRoot.style.display = 'block';
         document.body.classList.add('locked');
-        ReactDOM.render(<App imgURL={res.image} />, reactRoot);
+        ReactDOM.render(
+          <App imgURL={res.image} originalSize={rect} />,
+          reactRoot
+        );
       }
     );
   }
