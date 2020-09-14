@@ -1,0 +1,10 @@
+#dc-root {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+body.locked{
+    height: 100vh;
+    overflow: hidden;
+}
