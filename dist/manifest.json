@@ -20,7 +20,8 @@
       "persistent": true
     },
     "permissions": [
-      "https://*/*"
+      "https://*/*",
+      "storage"
     ],
     "content_security_policy": "default-src 'self'; style-src 'self' data: 'unsafe-inline';",
     "content_scripts": [

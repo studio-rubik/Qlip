@@ -32,10 +32,12 @@ function disableExtension() {
     document.removeEventListener('mouseover', handleMouseOver);
 }
 
-let enabled = window.localStorage.getItem('enabled') ?? 'true';
-if (enabled === 'true') {
-    enableExtension();
-}
+chrome.storage.local.get(({ enabled }) => {
+    console.log(enabled);
+    if (enabled == null || enabled === true) {
+        enableExtension();
+    }
+}) ;
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     switch (msg.type) {
