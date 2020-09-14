@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import html2canvas from 'html2canvas';
 
 import App from './app';
 
@@ -17,6 +16,27 @@ function init() {
 
 window.addEventListener('load', init, false);
 
+type OutlineStyles = {
+  outline: string;
+  outlineOffset: string;
+  zIndex: string;
+};
+
+function tilStyleApplied(
+  element: HTMLElement,
+  style: OutlineStyles
+): Promise<void> {
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (Object.entries(style).every(([k, v]) => element.style[k] === v)) {
+        resolve();
+        clearInterval(interval);
+        return;
+      }
+    }, 50);
+  });
+}
+
 function handleMouseOver(e: MouseEvent) {
   const elm = e.target as HTMLElement;
   savedOutline = elm.style.outline;
@@ -24,7 +44,7 @@ function handleMouseOver(e: MouseEvent) {
   savedZIndex = elm.style.zIndex;
   elm.style.outline = '#619ec988 solid 5px';
   elm.style.outlineOffset = '-5px';
-  elm.style.zIndex = '100';
+  elm.style.zIndex = '100000';
 
   function recover() {
     elm.style.outline = savedOutline;
@@ -39,6 +59,11 @@ function handleMouseOver(e: MouseEvent) {
     c.preventDefault();
     c.stopPropagation();
     recover();
+    await tilStyleApplied(elm, {
+      outline: savedOutline,
+      outlineOffset: savedOffset,
+      zIndex: savedZIndex,
+    });
     const rect = elm.getBoundingClientRect();
     chrome.runtime.sendMessage(
       {
