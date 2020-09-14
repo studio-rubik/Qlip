@@ -14,10 +14,5 @@ function publish(msg: any) {
 
 
 chrome.browserAction.onClicked.addListener((tab) => { 
-    chrome.storage.local.get(({ enabled }) => {
-        console.log(enabled);
-        const newVal = !(enabled == null || enabled === true)
-        publish({type: 'enabled', value: newVal});
-        chrome.storage.local.set({enabled: newVal});
-    }) ;
+    chrome.tabs.sendMessage(tab.id, {type: 'toggle'});
 });
