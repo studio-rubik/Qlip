@@ -12,6 +12,7 @@ type Props = {
 
 const App: React.FC<Props> = ({ imgURL, originalSize }) => {
   useEffect(() => {
+    console.log('api', API_URL);
     Modal.setAppElement('#dc-root');
   }, []);
 
