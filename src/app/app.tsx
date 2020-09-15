@@ -36,7 +36,7 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
       shouldCloseOnOverlayClick={true}
     >
       <div>
-        <img
+        <Img
           src={imgURL}
           style={{ width: originalSize.width, height: originalSize.height }}
         />
@@ -54,8 +54,8 @@ const Dim = styled.div`
 `;
 
 const Img = styled.img`
-  max-height: 100%;
-  max-width: 100%;
+  border-radius: 6px;
+  box-shadow: 0px 0px 7px 0 #0005;
 `;
 
 export default App;
