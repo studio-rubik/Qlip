@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link, Switch, Route, Redirect } from 'react-router-dom';
 import Helmet from 'react-helmet';
 
 import { useAuth0 } from './auth0';
@@ -12,15 +11,10 @@ function App() {
 
   return (
     <>
-      <Helmet titleTemplate="%s - WouldYouPlay" defaultTitle="WouldYouPlay" />
+      <Helmet titleTemplate="%s - DomClipper" defaultTitle="DomClipper" />
       {isAuthenticated ? <Main /> : <Auth />}
     </>
   );
 }
-
-const RedirectExt: React.FC<{ to: string }> = ({ to }) => {
-  window.location.replace(to);
-  return <></>;
-};
 
 export default App;
