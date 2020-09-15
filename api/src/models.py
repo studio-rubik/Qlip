@@ -70,6 +70,7 @@ class Website(BaseModel):
 class Component(BaseModel):
     name = CharField()
     website = ForeignKeyField(Website)
+    user_id = CharField()
 
 
 class ComponentFile(File):
