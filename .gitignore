@@ -1,5 +1,1 @@
-.DS_Store
-dist/js/
-node_modules/
 .history/
-*.log

@@ -1,0 +1,6 @@
+.DS_Store
+dist/js/
+node_modules/
+*.log
+
+.history/
