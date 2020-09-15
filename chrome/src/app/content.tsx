@@ -75,7 +75,7 @@ function handleMouseOver(e: MouseEvent) {
     };
     chrome.runtime.sendMessage(
       {
-        message: 'capture',
+        type: 'capture',
         area: { x: rect.x, y: rect.y, w: rect.width, h: rect.height },
         dpr: devicePixelRatio,
       },
@@ -87,7 +87,7 @@ function handleMouseOver(e: MouseEvent) {
         reactRoot.style.display = 'block';
         document.body.classList.add('locked');
         ReactDOM.render(
-          <App imgURL={res.image} originalSize={rect} />,
+          <App imgURL={res.data} originalSize={rect} />,
           reactRoot
         );
       }
@@ -119,6 +119,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     case 'toggle':
       enabled = !enabled;
       enabled ? enableExtension() : disableExtension();
+      break;
+    case 'api.component.add':
       break;
     default:
       break;

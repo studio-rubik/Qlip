@@ -3,7 +3,7 @@ const path = require('path');
 
 const API_URL = {
   production: JSON.stringify('prod-url'),
-  development: JSON.stringify('dev-url'),
+  development: JSON.stringify('http://localhost:5000'),
 };
 
 // check environment mode

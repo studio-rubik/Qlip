@@ -27,7 +27,16 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
     ReactDOM.unmountComponentAtNode(document.getElementById('dc-root'));
   };
 
-  const handleSaveClick = () => {};
+  const handleSaveClick = async () => {
+    chrome.runtime.sendMessage(
+      {
+        type: 'api.component.add',
+        dataURL: imgURL,
+        domain: window.location.hostname,
+      },
+      (res) => {}
+    );
+  };
 
   return (
     <Modal
@@ -43,7 +52,7 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
         />
       </div>
       <div>
-        <button>Save</button>
+        <button onClick={handleSaveClick}>Save</button>
       </div>
     </Modal>
   );

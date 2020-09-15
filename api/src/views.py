@@ -1,11 +1,21 @@
-from flask import request, abort
+from flask import request, abort, g
 from boto3.exceptions import Boto3Error
 from botocore.client import ClientError
 
 from .app import app
 from .auth import require_auth
-from .deps import s3
 from . import models
+
+
+@app.before_request
+def before_request():
+    models.db.connect()
+
+
+@app.after_request
+def after_request(response):
+    models.db.close()
+    return response
 
 
 @app.route("/", methods=["GET"])
@@ -23,18 +33,22 @@ def users():
 
 @app.route("/files", methods=["POST"])
 def files():
-    bucket_name = "files"
-    try:
-        s3.meta.client.head_bucket(Bucket=bucket_name)
-    except ClientError:
-        bucket = s3.create_bucket(Bucket=bucket_name)
-    else:
-        bucket = s3.Bucket(bucket_name)
+    for _, file in request.files.items():
+        file_key = file.filename
+        file_model = models.SomeFile.create(key=file_key, name=file_key)
+        file_model.store_file(file)
 
-    for name, file in request.files.items():
-        try:
-            bucket.upload_fileobj(file, file.filename)
-        except Boto3Error:
-            abort(500)
+
+@app.route("/components", methods=["POST"])
+def components_post():
+    userID = request.headers.get("DomClipper-User-ID")
+    print(request.form.get("domain"))
+    file = request.files.get("file")
+    site, created = models.Website.get_or_create(
+        domain=request.form.get("domain"), name=""
+    )
+    comp = models.Component.create(name=request.form.get("name"), website=site)
+    comp_file = models.ComponentFile.create(key=comp.id, component=comp)
+    comp_file.store_file(file)
 
     return {}, 200
