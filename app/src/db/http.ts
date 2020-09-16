@@ -1,4 +1,5 @@
 // Wrapper class of fetch, for convenient request to the backend.
+import camelkeys from 'camelcase-keys';
 
 enum HttpMethod {
   GET = 'GET',
@@ -8,6 +9,9 @@ enum HttpMethod {
   DELETE = 'DELETE',
 }
 
+const uuidRegex = new RegExp(
+  /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
+);
 const CONTENT_TYPE = 'Content-Type' as const;
 const APPLICATION_JSON = 'application/json' as const;
 
@@ -135,7 +139,8 @@ export default class Http {
     // Convert to json if content-type is matched, else create object with
     // `data` property whose value is plain string.
     if (resp.headers.get(CONTENT_TYPE)?.split(';')[0] === APPLICATION_JSON) {
-      return resp.json();
+      const json = await resp.json();
+      return camelkeys(json, { deep: true, exclude: [uuidRegex] }) as any;
     } else {
       const data = await resp.text();
       return { data };

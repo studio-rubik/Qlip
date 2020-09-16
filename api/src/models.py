@@ -76,7 +76,7 @@ class Component(BaseModel):
 class ComponentFile(File):
     bucket = "components"
 
-    component = ForeignKeyField(Component, on_delete=CASCADE)
+    component = ForeignKeyField(Component, backref="file", on_delete=CASCADE)
 
 
 class ComponentTag(BaseModel):

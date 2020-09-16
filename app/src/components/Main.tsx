@@ -1,20 +1,31 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Switch, Route } from 'react-router-dom';
 
 import useRepository from '../hooks/useRepository';
+import { useStore } from '../store/';
+
+import Components from './Components';
 
 const Main = () => {
   const repo = useRepository();
+  const set = useStore((store) => store.set);
+
   useEffect(() => {
-    repo.test().then((resp) => {
-      console.log(resp);
+    repo.componentsFilter().then((resp) => {
+      set((store) => {
+        store.components = resp.data.components;
+        store.componentFiles = resp.data.componentFiles;
+        store.websites = resp.data.websites;
+      });
     });
-  }, [repo]);
+  }, [repo, set]);
 
   return (
     <>
       <Switch>
-        <Route path={`/`}>Hello</Route>
+        <Route path={`/`}>
+          <Components />
+        </Route>
       </Switch>
     </>
   );

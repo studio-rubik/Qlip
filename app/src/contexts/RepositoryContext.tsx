@@ -3,7 +3,6 @@ import ServerRepository from '../db';
 
 import * as errors from '../common/errors';
 import Repository from '../interface/repository';
-import { useAuth0 } from '../auth0';
 
 const serverRepository = new ServerRepository(
   process.env.REACT_APP_BACKEND_URL!,
@@ -21,33 +20,9 @@ serverRepository.client.afterResponse((resp) => {
 export const RepositoryContext = createContext<Repository>(serverRepository);
 
 export const RepositoryCtxProvider: React.FC = ({ children }) => {
-  const {
-    isAuthenticated,
-    getTokenSilently,
-    loading: authLoading,
-  } = useAuth0();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fn() {
-      if (authLoading || !isAuthenticated) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const authToken = await getTokenSilently();
-        serverRepository.setAuthToken(authToken || null);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fn();
-  }, [getTokenSilently, authLoading, isAuthenticated]);
   return (
     <RepositoryContext.Provider value={serverRepository}>
-      {loading ? 'loading' : children}
+      {children}
     </RepositoryContext.Provider>
   );
 };

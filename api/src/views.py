@@ -1,10 +1,24 @@
+import typing
 from flask import request, abort, g
 from boto3.exceptions import Boto3Error
 from botocore.client import ClientError
 
 from .app import app
 from .auth import require_auth
+from .utils import make_response
 from . import models
+
+
+class Entity:
+    def __init__(self, data: typing.List[typing.Dict]):
+        self._raw = {"by_id": {}, "all_ids": []}
+        for dic in data:
+            id = str(dic["id"])
+            self._raw["by_id"][id] = dic
+            self._raw["all_ids"].append(id)
+
+    def to_dict(self):
+        return self._raw
 
 
 @app.before_request
@@ -53,3 +67,22 @@ def components_post():
     comp_file.store_file(file)
 
     return {}, 200
+
+
+@app.route("/components", methods=["GET"])
+def components_get():
+    user_id = request.headers.get("DomClipper-User-ID")
+    components = models.Component.filter(models.Component.user_id == user_id).order_by(
+        models.Component.created_at.desc()
+    )
+    files = [comp.file.first() for comp in components]
+    sites = [comp.website for comp in components]
+
+    return make_response(
+        data={
+            "components": Entity([comp.to_dict() for comp in components]).to_dict(),
+            "component_files": Entity([f.to_dict() for f in files]).to_dict(),
+            "websites": Entity([s.to_dict() for s in sites]).to_dict(),
+        },
+        status=200,
+    )
