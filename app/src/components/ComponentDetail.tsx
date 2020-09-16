@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Select, Button } from 'antd';
+import { Select, Button, notification } from 'antd';
 
 import useRepository from '../hooks/useRepository';
 import { useStore } from '../store/';
@@ -9,9 +9,15 @@ type Props = {
   component: any;
   file: any;
   website: any;
+  onSubmitSuccess?: () => void;
 };
 
-const ComponentDetail: React.FC<Props> = ({ component, file, website }) => {
+const ComponentDetail: React.FC<Props> = ({
+  component,
+  file,
+  website,
+  onSubmitSuccess,
+}) => {
   const repo = useRepository();
   const set = useStore((store) => store.set);
   const tags = useStore((store) =>
@@ -25,13 +31,28 @@ const ComponentDetail: React.FC<Props> = ({ component, file, website }) => {
   ));
 
   const [selectedTags, setSelectedTags] = useState<string[]>(component.tagIds);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (value: string[]) => {
     setSelectedTags(value);
   };
 
-  const handleUpdateClick = () => {
-    repo.componentTagsPost(component.id, selectedTags);
+  const handleUpdateClick = async () => {
+    try {
+      setSubmitting(true);
+      await repo.componentTagsPost(component.id, selectedTags);
+      set((store) => {
+        component.tagIds = selectedTags;
+        store.components.byId[component.id] = component;
+      });
+      notification.success({ message: 'Your component updated' });
+      if (onSubmitSuccess != null) onSubmitSuccess();
+    } catch (e) {
+      console.log(e);
+      notification.error({ message: 'Sorry, something went wrong' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -50,7 +71,9 @@ const ComponentDetail: React.FC<Props> = ({ component, file, website }) => {
         >
           {options}
         </Select>
-        <Button onClick={handleUpdateClick}>Update</Button>
+        <Button loading={submitting} onClick={handleUpdateClick}>
+          Update
+        </Button>
       </div>
     </div>
   );
