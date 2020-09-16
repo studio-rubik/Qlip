@@ -43,14 +43,17 @@ const Main = () => {
     const queries = new URLSearchParams(location.search);
     const qs: { [k: string]: string } = {};
     const tag = queries.get('tag');
+    const site = queries.get('website');
     if (tag != null) {
       qs['tag'] = tag;
+    }
+    if (site != null) {
+      qs['website'] = site;
     }
     repo.componentsFilter(qs).then((resp) => {
       set((store) => {
         store.components = resp.data.components;
         store.componentFiles = resp.data.componentFiles;
-        store.websites = resp.data.websites;
       });
     });
   }, [repo, set, location]);

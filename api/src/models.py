@@ -73,7 +73,7 @@ class Website(BaseModel):
 
 class Component(BaseModel):
     name = CharField()
-    website = ForeignKeyField(Website)
+    website = ForeignKeyField(Website, backref="component")
     user_id = CharField()
     tags = ManyToManyField(Tag, backref="components")
 

@@ -74,22 +74,24 @@ def components_post():
 def components_get():
     user_id = request.headers.get("DomClipper-User-ID")
     tag = request.args.get("tag")
+    site = request.args.get("website")
 
     components = (
         models.Component.select()
-        .where((models.Component.user_id == user_id))
+        .where(models.Component.user_id == user_id)
         .order_by(models.Component.created_at.desc())
     )
     if tag is not None:
         components = [c for c in components if tag in c.tag_ids]
+    if site is not None:
+        components = [c for c in components if str(c.website.id) == site]
+
     files = [comp.file.first() for comp in components]
-    sites = [comp.website for comp in components]
 
     return make_response(
         data={
             "components": Entity([comp.to_dict() for comp in components]).to_dict(),
             "component_files": Entity([f.to_dict() for f in files]).to_dict(),
-            "websites": Entity([s.to_dict() for s in sites]).to_dict(),
         },
         status=200,
     )
@@ -109,6 +111,20 @@ def tags_get():
         (models.Tag.is_common == True) | (models.Tag.user_id == user_id)
     )
     return make_response({"tags": Entity([t.to_dict() for t in tags]).to_dict()})
+
+
+@app.route("/websites", methods=["GET"])
+def websites_get():
+    user_id = request.headers.get("DomClipper-User-ID")
+    sites = (
+        models.Website.select(models.Website)
+        .join(models.Component)
+        .where(models.Component.user_id == user_id)
+        .group_by(models.Website.id)
+        .order_by(models.Website.domain)
+    )
+
+    return make_response({"websites": Entity([w.to_dict() for w in sites]).to_dict()})
 
 
 # tag_ids are comma separated ids.
