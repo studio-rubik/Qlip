@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Row, Col, Card } from 'antd';
+import { Row, Col, Card, Tag } from 'antd';
 import Modal from 'react-modal';
 
 import useRepository from '../hooks/useRepository';
@@ -20,6 +20,9 @@ const Main = () => {
   );
   const websites = useStore((store) =>
     store.websites.allIds.map((id) => store.websites.byId[id]),
+  );
+  const tags = useStore((store) =>
+    store.tags.allIds.map((id) => store.tags.byId[id]),
   );
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedComponentID, setSelectedComponentID] = useState('');
@@ -64,7 +67,7 @@ const Main = () => {
 
   return (
     <>
-      <Row gutter={16}>
+      <Row gutter={[16, 16]}>
         {components.map((comp) => (
           <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
             <Card
@@ -77,9 +80,16 @@ const Main = () => {
               }
               onClick={() => handleCardClick(comp.id)}
             >
-              <Card.Meta
-                title={websites.find((s) => s.id === comp.website)?.domain}
-              />
+              <div>
+                <div>{websites.find((s) => s.id === comp.website)?.domain}</div>
+                <div>
+                  {tags
+                    .filter((t) => comp.tagIds.includes(t.id))
+                    .map((t) => (
+                      <Tag key={t.id}>{t.name}</Tag>
+                    ))}
+                </div>
+              </div>
             </Card>
           </Col>
         ))}
