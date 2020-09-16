@@ -56,31 +56,40 @@ const ComponentDetail: React.FC<Props> = ({
   };
 
   return (
-    <div>
+    <Container>
       <ImgWrapper>
         <DetailImg src={file.url} />
       </ImgWrapper>
-      <div>
-        <Select
-          mode="multiple"
-          allowClear
-          style={{ width: '100%' }}
-          placeholder="Please select"
-          value={selectedTags}
-          onChange={handleChange}
-        >
-          {options}
-        </Select>
-        <Button loading={submitting} onClick={handleUpdateClick}>
-          Update
-        </Button>
-      </div>
-    </div>
+      <Select
+        mode="multiple"
+        allowClear
+        style={{ width: '100%', margin: '30px 0' }}
+        placeholder="Please select"
+        value={selectedTags}
+        onChange={handleChange}
+      >
+        {options}
+      </Select>
+      <Button loading={submitting} onClick={handleUpdateClick}>
+        Update
+      </Button>
+    </Container>
   );
 };
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+`;
+
 const ImgWrapper = styled.div``;
 
-const DetailImg = styled.img``;
+const DetailImg = styled.img`
+  max-width: 100%;
+  max-height: 100%;
+`;
 
 export default ComponentDetail;
