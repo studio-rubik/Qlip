@@ -8,6 +8,7 @@ export type State = {
   set: (fn: SetState) => void;
   initialize: () => void;
   components: APIResponseEntity<any>;
+  tags: APIResponseEntity<any>;
   componentFiles: APIResponseEntity<any>;
   websites: APIResponseEntity<any>;
 };
@@ -18,6 +19,7 @@ const emptyEntity = { byId: {}, allIds: [] };
 
 const initialState = {
   components: emptyEntity,
+  tags: emptyEntity,
   componentFiles: emptyEntity,
   websites: emptyEntity,
 };

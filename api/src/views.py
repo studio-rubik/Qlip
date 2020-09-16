@@ -1,4 +1,5 @@
 import typing
+import itertools
 from flask import request, abort, g
 from boto3.exceptions import Boto3Error
 from botocore.client import ClientError
@@ -72,9 +73,15 @@ def components_post():
 @app.route("/components", methods=["GET"])
 def components_get():
     user_id = request.headers.get("DomClipper-User-ID")
-    components = models.Component.filter(models.Component.user_id == user_id).order_by(
-        models.Component.created_at.desc()
+    tag = request.args.get("tag")
+
+    components = (
+        models.Component.select()
+        .where((models.Component.user_id == user_id))
+        .order_by(models.Component.created_at.desc())
     )
+    if tag is not None:
+        components = [c for c in components if tag in c.tags]
     files = [comp.file.first() for comp in components]
     sites = [comp.website for comp in components]
 
@@ -86,3 +93,30 @@ def components_get():
         },
         status=200,
     )
+
+
+@app.route("/tags", methods=["POST"])
+def tags_post():
+    req = request.get_json()
+    models.Tag.create(name=req.get("name"))
+    return {}, 200
+
+
+@app.route("/tags", methods=["GET"])
+def tags_get():
+    user_id = request.headers.get("DomClipper-User-ID")
+    tags = models.Tag.select().where(
+        (models.Tag.is_common == True) | (models.Tag.user_id == user_id)
+    )
+    return make_response({"tags": Entity([t.to_dict() for t in tags]).to_dict()})
+
+
+@app.route("/components/<component_id>/tags/<tag_id>", methods=["POST"])
+def component_tags_post(id):
+    comp = models.Component.get_or_none(models.Component.id == id)
+    tag = models.Tag.get_or_none(models.Tag.id == id)
+    if comp is None or tag is None:
+        abort(400)
+    comp.tags.add(tag)
+
+    return {}, 200

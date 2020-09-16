@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useLocation } from 'react-router-dom';
+import shallow from 'zustand/shallow';
 import { Row, Col, Card } from 'antd';
 import Modal from 'react-modal';
 
 import useRepository from '../hooks/useRepository';
+import useQueryParam from '../hooks/useQueryParam';
 import { useStore } from '../store/';
 import styled from 'styled-components';
 
@@ -19,18 +21,26 @@ const Main = () => {
   const websites = useStore((store) =>
     store.websites.allIds.map((id) => store.websites.byId[id]),
   );
-  const params = useParams();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedImgURL, setSelectedImgURL] = useState('');
 
+  const location = useLocation();
+
   useEffect(() => {
-    repo.componentsFilter().then((resp) => {
+    const queries = new URLSearchParams(location.search);
+    const qs: { [k: string]: string } = {};
+    const tag = queries.get('tag');
+    if (tag != null) {
+      qs['tag'] = tag;
+    }
+    repo.componentsFilter(qs).then((resp) => {
       set((store) => {
         store.components = resp.data.components;
         store.componentFiles = resp.data.componentFiles;
+        store.websites = resp.data.websites;
       });
     });
-  }, [repo, set]);
+  }, [repo, set, location]);
 
   const handleCardClick = (url: string) => {
     setSelectedImgURL(url);

@@ -8,7 +8,9 @@ from peewee import (
     CharField,
     UUIDField,
     DateTimeField,
+    BooleanField,
     ForeignKeyField,
+    ManyToManyField,
 )
 from playhouse.shortcuts import model_to_dict
 
@@ -60,6 +62,8 @@ class User(BaseModel):
 
 class Tag(BaseModel):
     name = CharField()
+    is_common = BooleanField(default=False)
+    user_id = CharField()
 
 
 class Website(BaseModel):
@@ -71,6 +75,13 @@ class Component(BaseModel):
     name = CharField()
     website = ForeignKeyField(Website)
     user_id = CharField()
+    tags = ManyToManyField(Tag, backref="components")
+
+    def to_dict(self):
+        return model_to_dict(self, recurse=False, extra_attrs=["tags"])
+
+
+ComponentTag = Component.tags.get_through_model()
 
 
 class ComponentFile(File):
@@ -79,11 +90,12 @@ class ComponentFile(File):
     component = ForeignKeyField(Component, backref="file", on_delete=CASCADE)
 
 
-class ComponentTag(BaseModel):
-    component = ForeignKeyField(Component, on_delete=CASCADE)
-    tag = ForeignKeyField(Tag, on_delete=CASCADE)
-
-
 def create_tables():
     with db:
-        db.create_tables([User, Tag, Website, Component, ComponentFile, ComponentTag])
+        db.create_tables([User, Tag, Website, Component, ComponentTag, ComponentFile])
+
+
+def populate_common_tags():
+    with db:
+        Tag.create(name="Button", is_common=True, user_id="")
+        Tag.create(name="Header", is_common=True, user_id="")

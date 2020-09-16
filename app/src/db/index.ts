@@ -1,5 +1,5 @@
 import Http from './http';
-import Repository from '../interface/repository';
+import Repository, { ComponentsFilterQueries } from '../interface/repository';
 
 export default class ServerRepository implements Repository {
   client: Http;
@@ -16,7 +16,14 @@ export default class ServerRepository implements Repository {
     return this.client.get({ path: '' });
   }
 
-  componentsFilter() {
-    return this.client.get({ path: 'components' });
+  componentsFilter(queries: ComponentsFilterQueries) {
+    return this.client.get({
+      path: 'components',
+      queries: queries as { [k: string]: string },
+    });
+  }
+
+  tagsAll() {
+    return this.client.get({ path: 'tags' });
   }
 }

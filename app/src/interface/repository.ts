@@ -14,13 +14,23 @@ export type APIResponseEntity<T> = {
   allIds: string[];
 };
 
+export type ComponentsFilterQueries = {
+  tag?: string | null;
+  website?: string | null;
+};
+
 type ComponentsFilterResp = APIResponse<{
   components: APIResponseEntity<any>;
   componentFiles: APIResponseEntity<any>;
   websites: APIResponseEntity<any>;
 }>;
 
+type TagsAllResp = APIResponse<{ tags: APIResponseEntity<any> }>;
+
 export default interface Repository {
   test(): Promise<string>;
-  componentsFilter(): Promise<ComponentsFilterResp>;
+  componentsFilter(
+    params: ComponentsFilterQueries,
+  ): Promise<ComponentsFilterResp>;
+  tagsAll(): Promise<TagsAllResp>;
 }

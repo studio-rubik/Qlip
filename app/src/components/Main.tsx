@@ -7,19 +7,6 @@ import { useStore } from '../store/';
 import Components from './Components';
 
 const Main = () => {
-  const repo = useRepository();
-  const set = useStore((store) => store.set);
-
-  useEffect(() => {
-    repo.componentsFilter().then((resp) => {
-      set((store) => {
-        store.components = resp.data.components;
-        store.componentFiles = resp.data.componentFiles;
-        store.websites = resp.data.websites;
-      });
-    });
-  }, [repo, set]);
-
   return (
     <>
       <Switch>
