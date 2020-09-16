@@ -81,7 +81,7 @@ def components_get():
         .order_by(models.Component.created_at.desc())
     )
     if tag is not None:
-        components = [c for c in components if tag in c.tags]
+        components = [c for c in components if tag in c.tag_ids]
     files = [comp.file.first() for comp in components]
     sites = [comp.website for comp in components]
 
@@ -111,12 +111,14 @@ def tags_get():
     return make_response({"tags": Entity([t.to_dict() for t in tags]).to_dict()})
 
 
-@app.route("/components/<component_id>/tags/<tag_id>", methods=["POST"])
-def component_tags_post(id):
-    comp = models.Component.get_or_none(models.Component.id == id)
-    tag = models.Tag.get_or_none(models.Tag.id == id)
-    if comp is None or tag is None:
+# tag_ids are comma separated ids.
+@app.route("/components/<component_id>/tags/<tag_ids>", methods=["POST"])
+def component_tags_post(component_id: str, tag_ids: str):
+    comp = models.Component.get_or_none(models.Component.id == component_id)
+    tags = models.Tag.select().where(models.Tag.id.in_(tag_ids.split(",")))
+    if comp is None:
         abort(400)
-    comp.tags.add(tag)
+    comp.tags.clear()
+    comp.tags.add(list(tags))
 
     return {}, 200

@@ -33,4 +33,5 @@ export default interface Repository {
     params: ComponentsFilterQueries,
   ): Promise<ComponentsFilterResp>;
   tagsAll(): Promise<TagsAllResp>;
+  componentTagsPost(component: string, tags: string[]): Promise<void>;
 }

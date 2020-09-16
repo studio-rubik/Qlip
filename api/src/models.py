@@ -77,8 +77,12 @@ class Component(BaseModel):
     user_id = CharField()
     tags = ManyToManyField(Tag, backref="components")
 
+    @property
+    def tag_ids(self):
+        return [str(t.id) for t in self.tags]
+
     def to_dict(self):
-        return model_to_dict(self, recurse=False, extra_attrs=["tags"])
+        return model_to_dict(self, recurse=False, extra_attrs=["tag_ids"])
 
 
 ComponentTag = Component.tags.get_through_model()

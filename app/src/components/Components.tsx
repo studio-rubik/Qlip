@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import shallow from 'zustand/shallow';
 import { Row, Col, Card } from 'antd';
 import Modal from 'react-modal';
 
 import useRepository from '../hooks/useRepository';
-import useQueryParam from '../hooks/useQueryParam';
 import { useStore } from '../store/';
 import styled from 'styled-components';
+
+import ComponentDetail from './ComponentDetail';
 
 const Main = () => {
   const repo = useRepository();
@@ -22,7 +22,17 @@ const Main = () => {
     store.websites.allIds.map((id) => store.websites.byId[id]),
   );
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedImgURL, setSelectedImgURL] = useState('');
+  const [selectedComponentID, setSelectedComponentID] = useState('');
+
+  const selectedItems = useMemo(() => {
+    if (selectedComponentID === '') return null;
+    const component = components.find((c) => c.id === selectedComponentID);
+    return {
+      component,
+      file: files.find((f) => f.component === component.id),
+      website: websites.find((w) => w.id === component.website),
+    };
+  }, [components, files, selectedComponentID, websites]);
 
   const location = useLocation();
 
@@ -42,13 +52,13 @@ const Main = () => {
     });
   }, [repo, set, location]);
 
-  const handleCardClick = (url: string) => {
-    setSelectedImgURL(url);
+  const handleCardClick = (componentID: string) => {
+    setSelectedComponentID(componentID);
     setModalOpen(true);
   };
 
   const closeModal = () => {
-    setSelectedImgURL('');
+    setSelectedComponentID('');
     setModalOpen(false);
   };
 
@@ -65,9 +75,7 @@ const Main = () => {
                   alt=""
                 />
               }
-              onClick={() =>
-                handleCardClick(files.find((f) => f.component === comp.id)?.url)
-              }
+              onClick={() => handleCardClick(comp.id)}
             >
               <Card.Meta
                 title={websites.find((s) => s.id === comp.website)?.domain}
@@ -81,18 +89,20 @@ const Main = () => {
         shouldCloseOnOverlayClick
         onRequestClose={closeModal}
       >
-        <DetailImg src={selectedImgURL} />
+        {selectedItems != null ? (
+          <ComponentDetail
+            component={selectedItems.component}
+            file={selectedItems.file}
+            website={selectedItems.website}
+          />
+        ) : null}
       </Modal>
     </>
   );
 };
 
-const ImgWrapper = styled.div``;
-
 const CardImg = styled.img`
   image-rendering: -webkit-optimize-contrast;
 `;
-
-const DetailImg = styled.img``;
 
 export default Main;
