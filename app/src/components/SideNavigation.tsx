@@ -48,8 +48,8 @@ function SideNavigation() {
       <Menu
         theme="dark"
         mode="inline"
-        defaultOpenKeys={['tags']}
-        style={{ height: `calc(100% - ${50}px)`, borderRight: 0 }}
+        defaultOpenKeys={['tags', 'websites']}
+        style={{ height: `calc(100% - ${LOGO_HEIGHT}px)`, borderRight: 0 }}
       >
         <Menu.SubMenu key="tags" title="Tags">
           {tags.map((t) => (
