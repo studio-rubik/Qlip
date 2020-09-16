@@ -1,10 +1,13 @@
 import React, { useEffect } from 'react';
+import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Layout, Menu, Tag } from 'antd';
 import 'antd/dist/antd.css';
 
 import useRepository from '../hooks/useRepository';
 import { useStore } from '../store';
+
+const LOGO_HEIGHT = 50;
 
 function SideNavigation() {
   const repo = useRepository();
@@ -30,11 +33,23 @@ function SideNavigation() {
   }, [repo, set]);
 
   return (
-    <Layout.Sider width={200} className="site-layout-background">
+    <Layout.Sider
+      style={{
+        overflow: 'auto',
+        height: '100vh',
+        position: 'fixed',
+        left: 0,
+      }}
+      className="site-layout-background"
+    >
+      <Link to="/">
+        <Logo>DOMCLIPPER</Logo>
+      </Link>
       <Menu
+        theme="dark"
         mode="inline"
         defaultOpenKeys={['tags']}
-        style={{ height: '100%', borderRight: 0 }}
+        style={{ height: `calc(100% - ${50}px)`, borderRight: 0 }}
       >
         <Menu.SubMenu key="tags" title="Tags">
           {tags.map((t) => (
@@ -54,5 +69,14 @@ function SideNavigation() {
     </Layout.Sider>
   );
 }
+
+const Logo = styled.div`
+  color: #da50af;
+  height: ${LOGO_HEIGHT}px;
+  line-height: ${LOGO_HEIGHT}px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+`;
 
 export default SideNavigation;
