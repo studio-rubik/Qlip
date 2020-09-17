@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Select, Button, notification } from 'antd';
+import React, { useState, useRef } from 'react';
+import { Input, Select, Button, Tag, Row, Col, notification } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 
 import useRepository from '../hooks/useRepository';
 import { useStore } from '../store/';
@@ -31,10 +32,52 @@ const ComponentDetail: React.FC<Props> = ({
   ));
 
   const [selectedTags, setSelectedTags] = useState<string[]>(component.tagIds);
+
+  const newTagRef = useRef<any>(null);
+  const [newTagValue, setNewTagValue] = useState('');
+  const [newTagEditing, setNewTagEditing] = useState(false);
+  const [newTagSubmitting, setNewTagSubmitting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (value: string[]) => {
     setSelectedTags(value);
+  };
+
+  const handleNewTagClick = () => {
+    setNewTagEditing(true);
+    setTimeout(() => {
+      newTagRef.current?.focus();
+    }, 50);
+  };
+
+  const handleNewTagChange = (e: any) => {
+    console.log(e.target.value);
+    setNewTagValue(e.target.value);
+  };
+
+  const handleNewTagBlur = () => {
+    setNewTagValue('');
+    setNewTagEditing(false);
+  };
+
+  const handleNewTagSubmit = async () => {
+    try {
+      setNewTagValue('');
+      setNewTagEditing(false);
+      setNewTagSubmitting(true);
+      const resp = await repo.tagPost(newTagValue);
+      set((store) => {
+        store.tags.byId[resp.data.tag.id] = resp.data.tag;
+        store.tags.allIds.push(resp.data.tag.id);
+      });
+      setSelectedTags((prev) => [...prev, resp.data.tag.id]);
+      notification.success({ message: 'New tag created' });
+    } catch (e) {
+      console.log(e);
+      notification.error({ message: 'Sorry, something went wrong' });
+    } finally {
+      setNewTagSubmitting(false);
+    }
   };
 
   const handleUpdateClick = async () => {
@@ -57,19 +100,55 @@ const ComponentDetail: React.FC<Props> = ({
 
   return (
     <Container>
-      <ImgWrapper>
-        <DetailImg src={file.url} />
-      </ImgWrapper>
-      <Select
-        mode="multiple"
-        allowClear
-        style={{ width: '100%', margin: '30px 0' }}
-        placeholder="Please select"
-        value={selectedTags}
-        onChange={handleChange}
-      >
-        {options}
-      </Select>
+      <Row>
+        <Col span={24} style={{ textAlign: 'center' }}>
+          <DetailImg src={file.url} />
+        </Col>
+      </Row>
+      <Row align="middle" justify="center">
+        <Col xxl={8} xl={10} xs={20}>
+          <Select
+            mode="multiple"
+            allowClear
+            style={{ width: '100%', margin: '30px 0' }}
+            placeholder="Select from Existing Tags"
+            value={selectedTags}
+            onChange={handleChange}
+          >
+            {options}
+          </Select>
+        </Col>
+        <Col span={4}>
+          {newTagEditing ? (
+            <Input
+              style={{
+                width: 78,
+                marginLeft: 12,
+                verticalAlign: 'top',
+              }}
+              ref={newTagRef}
+              disabled={newTagSubmitting}
+              type="text"
+              value={newTagValue}
+              onChange={handleNewTagChange}
+              onBlur={handleNewTagBlur}
+              onPressEnter={handleNewTagSubmit}
+            />
+          ) : (
+            <Tag
+              style={{
+                verticalAlign: 'middle',
+                marginLeft: 12,
+                background: '#fff',
+                borderStyle: 'dashed',
+              }}
+              onClick={handleNewTagClick}
+            >
+              <PlusOutlined /> Create Tag
+            </Tag>
+          )}
+        </Col>
+      </Row>
       <Button loading={submitting} onClick={handleUpdateClick}>
         Update
       </Button>
@@ -78,14 +157,9 @@ const ComponentDetail: React.FC<Props> = ({
 };
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   width: 100%;
   height: 100%;
 `;
-
-const ImgWrapper = styled.div``;
 
 const DetailImg = styled.img`
   max-width: 100%;

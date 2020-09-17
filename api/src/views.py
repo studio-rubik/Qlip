@@ -99,9 +99,10 @@ def components_get():
 
 @app.route("/tags", methods=["POST"])
 def tags_post():
+    user_id = request.headers.get("DomClipper-User-ID")
     req = request.get_json()
-    models.Tag.create(name=req.get("name"))
-    return {}, 200
+    tag = models.Tag.create(name=req.get("name"), user_id=user_id)
+    return make_response({"tag": tag.to_dict()})
 
 
 @app.route("/tags", methods=["GET"])

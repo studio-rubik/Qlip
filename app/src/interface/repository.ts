@@ -26,6 +26,7 @@ type ComponentsFilterResp = APIResponse<{
 }>;
 
 type TagsAllResp = APIResponse<{ tags: APIResponseEntity<any> }>;
+type TagPostResp = APIResponse<{ tag: any }>;
 type WebsitesAllResp = APIResponse<{ websites: APIResponseEntity<any> }>;
 
 export default interface Repository {
@@ -34,6 +35,7 @@ export default interface Repository {
     params: ComponentsFilterQueries,
   ): Promise<ComponentsFilterResp>;
   tagsAll(): Promise<TagsAllResp>;
+  tagPost(name: string): Promise<TagPostResp>;
   websitesAll(): Promise<WebsitesAllResp>;
   componentTagsPost(component: string, tags: string[]): Promise<void>;
 }

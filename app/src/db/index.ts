@@ -27,6 +27,10 @@ export default class ServerRepository implements Repository {
     return this.client.get({ path: 'tags' });
   }
 
+  tagPost(name: string) {
+    return this.client.post({ path: 'tags' }, { name });
+  }
+
   websitesAll() {
     return this.client.get({ path: 'websites' });
   }
