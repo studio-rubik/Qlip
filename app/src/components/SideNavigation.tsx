@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Layout, Menu, Tag } from 'antd';
 import 'antd/dist/antd.css';
 
@@ -18,6 +18,17 @@ function SideNavigation() {
     store.websites.allIds.map((id) => store.websites.byId[id]),
   );
   const set = useStore((store) => store.set);
+  const queries = new URLSearchParams(useLocation().search);
+
+  const [selectedMenuItem, setSelectedMenuItem] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSelectedMenuItem(queries.get('tag') ?? queries.get('website'));
+  }, [queries]);
+
+  const handleSelect = (menuItem: any) => {
+    setSelectedMenuItem(menuItem.key);
+  };
 
   useEffect(() => {
     repo.tagsAll().then((resp) => {
@@ -48,17 +59,19 @@ function SideNavigation() {
       <Menu
         theme="dark"
         mode="inline"
-        defaultOpenKeys={['tags', 'websites']}
+        defaultOpenKeys={['tag', 'website']}
+        selectedKeys={selectedMenuItem ? [selectedMenuItem] : undefined}
+        onSelect={handleSelect}
         style={{ height: `calc(100% - ${LOGO_HEIGHT}px)`, borderRight: 0 }}
       >
-        <Menu.SubMenu key="tags" title="Tags">
+        <Menu.SubMenu key="tag" title="Tags">
           {tags.map((t) => (
             <Menu.Item key={t.id}>
               <Link to={`/?tag=${t.id}`}>{t.name}</Link>
             </Menu.Item>
           ))}
         </Menu.SubMenu>
-        <Menu.SubMenu key="websites" title="Website">
+        <Menu.SubMenu key="website" title="Websites">
           {websites.map((w) => (
             <Menu.Item key={w.id}>
               <Link to={`/?website=${w.id}`}>{w.domain}</Link>
