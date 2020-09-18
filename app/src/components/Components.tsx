@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Row, Col, Card, Tag, PageHeader } from 'antd';
+import { TagOutlined, GlobalOutlined } from '@ant-design/icons';
 import Modal from 'react-modal';
 
 import { useFetchComponents } from '../hooks/useRepository';
@@ -56,9 +57,18 @@ const Main = () => {
     const queries = new URLSearchParams(location.search);
     const id = queries.get('tag') ?? queries.get('website');
     if (id == null) return 'All';
+    const titleFactory = (icon: any, text: string) => (
+      <span>
+        {icon}
+        <span style={{ paddingLeft: 10 }}>{text}</span>
+      </span>
+    );
     return queries.get('tag') != null
-      ? tags.find((t) => t.id === id)?.name
-      : websites.find((w) => w.id === id)?.domain;
+      ? titleFactory(<TagOutlined />, tags.find((t) => t.id === id)?.name)
+      : titleFactory(
+          <GlobalOutlined />,
+          websites.find((w) => w.id === id)?.domain,
+        );
   }, [location.search, tags, websites]);
 
   const history = useHistory();
@@ -70,7 +80,7 @@ const Main = () => {
     <>
       <PageHeader
         title={title}
-        onBack={goHome}
+        onBack={title === 'All' ? undefined : goHome}
         style={{ background: 'white' }}
       />
       <CardsContainer>
