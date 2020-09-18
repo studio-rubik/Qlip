@@ -1,21 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Row, Col, Card, Tag, PageHeader } from 'antd';
 import Modal from 'react-modal';
 
-import useRepository, {
-  useFetchComponents,
-  useFetchTags,
-  useFetchWebsites,
-} from '../hooks/useRepository';
+import { useFetchComponents } from '../hooks/useRepository';
 import { useStore } from '../store/';
 import styled from 'styled-components';
 
 import ComponentDetail from './ComponentDetail';
 
 const Main = () => {
-  const repo = useRepository();
-  const set = useStore((store) => store.set);
   const components = useStore((store) =>
     store.components.allIds.map((id) => store.components.byId[id]),
   );
