@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
 import {
   Input,
   Select,
@@ -10,9 +9,15 @@ import {
   Divider,
   notification,
 } from 'antd';
-import { PlusOutlined, TagsFilled } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  TagsFilled,
+  GlobalOutlined,
+  ClockCircleOutlined,
+} from '@ant-design/icons';
 
 import color from '../common/color';
+import { fromUTC } from '../common/utils';
 import useRepository from '../hooks/useRepository';
 import { useStore } from '../store/';
 import styled from 'styled-components';
@@ -109,7 +114,7 @@ const ComponentDetail: React.FC<Props> = ({
     }
   };
 
-  const history = useHistory();
+  const iconStyle = { fontSize: 18, marginRight: 10, color: color.primary };
 
   return (
     <Container>
@@ -119,12 +124,23 @@ const ComponentDetail: React.FC<Props> = ({
         </Col>
       </Row>
       <Divider />
+      <Row align="middle" gutter={[0, 24]}>
+        <ClockCircleOutlined style={iconStyle} />
+        {fromUTC.toRelative(component.updatedAt)}
+      </Row>
       <Row align="middle">
-        <TagsFilled
-          style={{ fontSize: 20, marginRight: 8, color: color.primary }}
-          alt="tags"
-        />
-        <Col xxl={{ span: 16, offset: 4 }} xs={{ span: 18 }}>
+        <GlobalOutlined style={iconStyle} />
+        <a
+          href={`https://${website.domain}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {website.domain}
+        </a>
+      </Row>
+      <Row align="middle">
+        <TagsFilled style={iconStyle} alt="tags" />
+        <Col md={{ span: 12, offset: 0 }} xs={{ span: 18 }}>
           <Select
             mode="multiple"
             allowClear
@@ -167,7 +183,7 @@ const ComponentDetail: React.FC<Props> = ({
           )}
         </Col>
       </Row>
-      <Row justify="center">
+      <Row style={{ paddingTop: 20 }} justify="center">
         <Button type="primary" loading={submitting} onClick={handleUpdateClick}>
           Save
         </Button>
