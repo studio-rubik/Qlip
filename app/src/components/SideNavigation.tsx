@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Modal, message } from 'antd';
 import {
   CloseCircleOutlined,
-  TagOutlined,
+  TagsOutlined,
   GlobalOutlined,
   MoreOutlined,
   ExclamationCircleOutlined,
@@ -99,7 +99,7 @@ function SideNavigation() {
           onSelect={handleSelect}
           style={{ height: `calc(100% - ${LOGO_HEIGHT}px)`, borderRight: 0 }}
         >
-          <Menu.SubMenu key="tag" title="Tags" icon={<TagOutlined />}>
+          <Menu.SubMenu key="tag" title="Tags" icon={<TagsOutlined />}>
             {tags.map((t) => (
               <Menu.Item
                 key={t.id}

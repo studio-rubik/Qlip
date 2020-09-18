@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Row, Col, Card, Tag, PageHeader } from 'antd';
-import { TagOutlined, GlobalOutlined } from '@ant-design/icons';
+import { TagOutlined, GlobalOutlined, BarsOutlined } from '@ant-design/icons';
 import Modal from 'react-modal';
 
 import { useFetchComponents } from '../hooks/useRepository';
@@ -56,13 +56,13 @@ const Main = () => {
   const title = useMemo(() => {
     const queries = new URLSearchParams(location.search);
     const id = queries.get('tag') ?? queries.get('website');
-    if (id == null) return 'All';
     const titleFactory = (icon: any, text: string) => (
       <span>
         {icon}
         <span style={{ paddingLeft: 10 }}>{text}</span>
       </span>
     );
+    if (id == null) return titleFactory(<BarsOutlined />, 'All');
     return queries.get('tag') != null
       ? titleFactory(<TagOutlined />, tags.find((t) => t.id === id)?.name)
       : titleFactory(
@@ -71,18 +71,9 @@ const Main = () => {
         );
   }, [location.search, tags, websites]);
 
-  const history = useHistory();
-  const goHome = () => {
-    history.push('/');
-  };
-
   return (
     <>
-      <PageHeader
-        title={title}
-        onBack={title === 'All' ? undefined : goHome}
-        style={{ background: 'white' }}
-      />
+      <PageHeader title={title} style={{ background: 'white' }} />
       <CardsContainer>
         <Row gutter={[16, 16]}>
           {components.map((comp) => (
