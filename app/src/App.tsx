@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Helmet from 'react-helmet';
 import { Layout } from 'antd';
 import 'antd/dist/antd.css';
+import './antd.override.css';
 
 import Main from './components/Main';
 import SideNavigation from './components/SideNavigation';
@@ -29,7 +30,6 @@ function App() {
 }
 const Container = styled.div`
   margin: 0 auto;
-  padding: 12px 12px;
   min-height: 100vh;
 `;
 

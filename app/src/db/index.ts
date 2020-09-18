@@ -31,6 +31,10 @@ export default class ServerRepository implements Repository {
     return this.client.post({ path: 'tags' }, { name });
   }
 
+  tagDelete(id: string) {
+    return this.client.delete({ path: 'tags/:id', params: [id] });
+  }
+
   websitesAll() {
     return this.client.get({ path: 'websites' });
   }

@@ -1,9 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Row, Col, Card, Tag } from 'antd';
+import { Row, Col, Card, Tag, PageHeader } from 'antd';
 import Modal from 'react-modal';
 
-import useRepository from '../hooks/useRepository';
+import useRepository, {
+  useFetchComponents,
+  useFetchTags,
+  useFetchWebsites,
+} from '../hooks/useRepository';
 import { useStore } from '../store/';
 import styled from 'styled-components';
 
@@ -37,26 +41,11 @@ const Main = () => {
     };
   }, [components, files, selectedComponentID, websites]);
 
-  const location = useLocation();
+  const fetchComponents = useFetchComponents();
 
   useEffect(() => {
-    const queries = new URLSearchParams(location.search);
-    const qs: { [k: string]: string } = {};
-    const tag = queries.get('tag');
-    const site = queries.get('website');
-    if (tag != null) {
-      qs['tag'] = tag;
-    }
-    if (site != null) {
-      qs['website'] = site;
-    }
-    repo.componentsFilter(qs).then((resp) => {
-      set((store) => {
-        store.components = resp.data.components;
-        store.componentFiles = resp.data.componentFiles;
-      });
-    });
-  }, [repo, set, location]);
+    fetchComponents();
+  }, [fetchComponents]);
 
   const handleCardClick = (componentID: string) => {
     setSelectedComponentID(componentID);
@@ -70,33 +59,42 @@ const Main = () => {
 
   return (
     <>
-      <Row gutter={[16, 16]}>
-        {components.map((comp) => (
-          <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
-            <Card
-              hoverable
-              cover={
-                <CardImg
-                  src={files.find((f) => f.component === comp.id)?.url}
-                  alt=""
-                />
-              }
-              onClick={() => handleCardClick(comp.id)}
-            >
-              <div>
-                <div>{websites.find((s) => s.id === comp.website)?.domain}</div>
+      <PageHeader
+        title="Headers"
+        onBack={() => null}
+        style={{ background: 'white' }}
+      />
+      <CardsContainer>
+        <Row gutter={[16, 16]}>
+          {components.map((comp) => (
+            <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
+              <Card
+                hoverable
+                cover={
+                  <CardImg
+                    src={files.find((f) => f.component === comp.id)?.url}
+                    alt=""
+                  />
+                }
+                onClick={() => handleCardClick(comp.id)}
+              >
                 <div>
-                  {tags
-                    .filter((t) => comp.tagIds.includes(t.id))
-                    .map((t) => (
-                      <Tag key={t.id}>{t.name}</Tag>
-                    ))}
+                  <div>
+                    {websites.find((s) => s.id === comp.website)?.domain}
+                  </div>
+                  <div>
+                    {tags
+                      .filter((t) => comp.tagIds.includes(t.id))
+                      .map((t) => (
+                        <Tag key={t.id}>{t.name}</Tag>
+                      ))}
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </CardsContainer>
       <Modal
         isOpen={modalOpen}
         shouldCloseOnOverlayClick
@@ -114,6 +112,10 @@ const Main = () => {
     </>
   );
 };
+
+const CardsContainer = styled.div`
+  padding: 16px;
+`;
 
 const CardImg = styled.img`
   image-rendering: -webkit-optimize-contrast;

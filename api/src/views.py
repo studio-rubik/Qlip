@@ -1,8 +1,5 @@
 import typing
-import itertools
-from flask import request, abort, g
-from boto3.exceptions import Boto3Error
-from botocore.client import ClientError
+from flask import request, abort
 
 from .app import app
 from .auth import require_auth
@@ -112,6 +109,13 @@ def tags_get():
         (models.Tag.is_common == True) | (models.Tag.user_id == user_id)
     )
     return make_response({"tags": Entity([t.to_dict() for t in tags]).to_dict()})
+
+
+@app.route("/tags/<id>", methods=["DELETE"])
+def tags_delete(id: str):
+    models.ComponentTag.delete().where(models.ComponentTag.tag == id).execute()
+    models.Tag.delete_by_id(id)
+    return {}, 200
 
 
 @app.route("/websites", methods=["GET"])

@@ -36,6 +36,7 @@ export default interface Repository {
   ): Promise<ComponentsFilterResp>;
   tagsAll(): Promise<TagsAllResp>;
   tagPost(name: string): Promise<TagPostResp>;
+  tagDelete(id: string): Promise<void>;
   websitesAll(): Promise<WebsitesAllResp>;
   componentTagsPost(component: string, tags: string[]): Promise<void>;
 }
