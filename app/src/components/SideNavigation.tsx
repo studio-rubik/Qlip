@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 
+import color from '../common/color';
 import useRepository, {
   useFetchComponents,
   useFetchTags,
@@ -99,7 +100,11 @@ function SideNavigation() {
           onSelect={handleSelect}
           style={{ height: `calc(100% - ${LOGO_HEIGHT}px)`, borderRight: 0 }}
         >
-          <Menu.SubMenu key="tag" title="Tags" icon={<TagsOutlined />}>
+          <Menu.SubMenu
+            key="tag"
+            title="Tags"
+            icon={<TagsOutlined style={{ color: color.primary }} />}
+          >
             {tags.map((t) => (
               <Menu.Item
                 key={t.id}
@@ -131,7 +136,7 @@ function SideNavigation() {
           <Menu.SubMenu
             key="website"
             title="Websites"
-            icon={<GlobalOutlined />}
+            icon={<GlobalOutlined style={{ color: color.primary }} />}
           >
             {websites.map((w) => (
               <Menu.Item key={w.id}>

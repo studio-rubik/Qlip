@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Row, Col, Card, Tag, PageHeader, Empty } from 'antd';
-import { TagOutlined, GlobalOutlined, BarsOutlined } from '@ant-design/icons';
-import Modal from 'react-modal';
+import { Row, Col, Card, Tag, Modal, PageHeader, Empty } from 'antd';
+import { TagFilled, GlobalOutlined, BarsOutlined } from '@ant-design/icons';
 
+import color from '../common/color';
 import { useFetchComponents } from '../hooks/useRepository';
 import { useStore } from '../store/';
 import styled from 'styled-components';
@@ -63,11 +63,18 @@ const Main = () => {
         <span style={{ paddingLeft: 10 }}>{text}</span>
       </span>
     );
-    if (id == null) return titleFactory(<BarsOutlined />, 'All Components');
+    if (id == null)
+      return titleFactory(
+        <BarsOutlined style={{ color: color.primary }} />,
+        'All Components',
+      );
     return queries.get('tag') != null
-      ? titleFactory(<TagOutlined />, tags.find((t) => t.id === id)?.name)
+      ? titleFactory(
+          <TagFilled style={{ color: color.primary }} />,
+          tags.find((t) => t.id === id)?.name,
+        )
       : titleFactory(
-          <GlobalOutlined />,
+          <GlobalOutlined style={{ color: color.primary }} />,
           websites.find((w) => w.id === id)?.domain,
         );
   }, [location.search, tags, websites]);
@@ -111,9 +118,10 @@ const Main = () => {
         )}
       </CardsContainer>
       <Modal
-        isOpen={modalOpen}
-        shouldCloseOnOverlayClick
-        onRequestClose={closeModal}
+        visible={modalOpen}
+        width="90%"
+        footer={null}
+        onCancel={closeModal}
       >
         {selectedItems != null ? (
           <ComponentDetail

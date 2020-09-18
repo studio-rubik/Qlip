@@ -1,8 +1,18 @@
 import React, { useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Input, Select, Button, Tag, Row, Col, notification } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import {
+  Input,
+  Select,
+  Button,
+  Tag,
+  Row,
+  Col,
+  Divider,
+  notification,
+} from 'antd';
+import { PlusOutlined, TagsFilled } from '@ant-design/icons';
 
+import color from '../common/color';
 import useRepository from '../hooks/useRepository';
 import { useStore } from '../store/';
 import styled from 'styled-components';
@@ -130,12 +140,17 @@ const ComponentDetail: React.FC<Props> = ({
           <DetailImg src={file.url} />
         </Col>
       </Row>
-      <Row align="middle" justify="center">
-        <Col xxl={8} xl={10} xs={20}>
+      <Divider />
+      <Row align="middle">
+        <TagsFilled
+          style={{ fontSize: 20, marginRight: 8, color: color.primary }}
+          alt="tags"
+        />
+        <Col xxl={{ span: 16, offset: 4 }} xs={{ span: 18 }}>
           <Select
             mode="multiple"
             allowClear
-            style={{ width: '100%', margin: '30px 0' }}
+            style={{ width: '100%', margin: '14px 0' }}
             placeholder="Select from Existing Tags"
             value={selectedTags}
             onChange={handleChange}
@@ -174,27 +189,17 @@ const ComponentDetail: React.FC<Props> = ({
           )}
         </Col>
       </Row>
-      <Row>
-        <Col span={6} offset={6}>
-          <Button
-            type="primary"
-            loading={submitting}
-            onClick={handleUpdateClick}
-          >
-            Update
-          </Button>
-        </Col>
-        <Col span={6} offset={6}>
-          <Button danger loading={deleting} onClick={handleDeleteClick}>
-            Delete
-          </Button>
-        </Col>
+      <Row justify="center">
+        <Button type="primary" loading={submitting} onClick={handleUpdateClick}>
+          Save Changes
+        </Button>
       </Row>
     </Container>
   );
 };
 
 const Container = styled.div`
+  padding: 20px;
   width: 100%;
   height: 100%;
 `;
