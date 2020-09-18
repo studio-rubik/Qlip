@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
 import { Row, Col, Card, Tag, PageHeader } from 'antd';
 import Modal from 'react-modal';
 
@@ -50,11 +51,26 @@ const Main = () => {
     setModalOpen(false);
   };
 
+  const location = useLocation();
+  const title = useMemo(() => {
+    const queries = new URLSearchParams(location.search);
+    const id = queries.get('tag') ?? queries.get('website');
+    if (id == null) return 'All';
+    return queries.get('tag') != null
+      ? tags.find((t) => t.id === id)?.name
+      : websites.find((w) => w.id === id)?.domain;
+  }, [location.search, tags, websites]);
+
+  const history = useHistory();
+  const goHome = () => {
+    history.push('/');
+  };
+
   return (
     <>
       <PageHeader
-        title="Headers"
-        onBack={() => null}
+        title={title}
+        onBack={goHome}
         style={{ background: 'white' }}
       />
       <CardsContainer>
