@@ -5,7 +5,7 @@ import {
   Col,
   Card,
   Tag,
-  Modal,
+  Modal as AntModal,
   PageHeader,
   Empty,
   Menu,
@@ -21,6 +21,7 @@ import {
   ExclamationCircleOutlined,
   FileTextOutlined,
 } from '@ant-design/icons';
+import Modal from 'react-modal';
 
 import color from '../common/color';
 import useRepository, { useFetchComponents } from '../hooks/useRepository';
@@ -28,6 +29,8 @@ import { useStore } from '../store/';
 import styled from 'styled-components';
 
 import ComponentDetail from './ComponentDetail';
+
+const { confirm } = AntModal;
 
 const Main = () => {
   const components = useStore((store) =>
@@ -104,7 +107,7 @@ const Main = () => {
   const [deleting, setDeleting] = useState(false);
   const confirmDeleteFactory = (compID: string) => {
     return () =>
-      Modal.confirm({
+      confirm({
         title: 'Delete Component?',
         icon: <ExclamationCircleOutlined />,
         content: "Associated components won't be deleted.",
@@ -205,10 +208,10 @@ const Main = () => {
         )}
       </CardsContainer>
       <Modal
-        visible={modalOpen}
-        width="90%"
-        footer={null}
-        onCancel={closeModal}
+        isOpen={modalOpen}
+        onRequestClose={closeModal}
+        shouldCloseOnOverlayClick
+        style={{ overlay: { background: '#0008' } }}
       >
         {selectedItems != null ? (
           <ComponentDetail
