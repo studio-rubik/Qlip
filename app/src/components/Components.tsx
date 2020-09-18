@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Row, Col, Card, Tag, PageHeader } from 'antd';
+import { Row, Col, Card, Tag, PageHeader, Empty } from 'antd';
 import { TagOutlined, GlobalOutlined, BarsOutlined } from '@ant-design/icons';
 import Modal from 'react-modal';
 
@@ -76,35 +76,39 @@ const Main = () => {
     <>
       <PageHeader title={title} style={{ background: 'white' }} />
       <CardsContainer>
-        <Row gutter={[16, 16]}>
-          {components.map((comp) => (
-            <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
-              <Card
-                hoverable
-                cover={
-                  <CardImg
-                    src={files.find((f) => f.component === comp.id)?.url}
-                    alt=""
-                  />
-                }
-                onClick={() => handleCardClick(comp.id)}
-              >
-                <div>
+        {components.length > 0 ? (
+          <Row gutter={[16, 16]}>
+            {components.map((comp) => (
+              <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
+                <Card
+                  hoverable
+                  cover={
+                    <CardImg
+                      src={files.find((f) => f.component === comp.id)?.url}
+                      alt=""
+                    />
+                  }
+                  onClick={() => handleCardClick(comp.id)}
+                >
                   <div>
-                    {websites.find((s) => s.id === comp.website)?.domain}
+                    <div>
+                      {websites.find((s) => s.id === comp.website)?.domain}
+                    </div>
+                    <div>
+                      {tags
+                        .filter((t) => comp.tagIds.includes(t.id))
+                        .map((t) => (
+                          <Tag key={t.id}>{t.name}</Tag>
+                        ))}
+                    </div>
                   </div>
-                  <div>
-                    {tags
-                      .filter((t) => comp.tagIds.includes(t.id))
-                      .map((t) => (
-                        <Tag key={t.id}>{t.name}</Tag>
-                      ))}
-                  </div>
-                </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        ) : (
+          <Empty description="No Component Found" />
+        )}
       </CardsContainer>
       <Modal
         isOpen={modalOpen}
