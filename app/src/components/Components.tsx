@@ -63,7 +63,7 @@ const Main = () => {
         <span style={{ paddingLeft: 10 }}>{text}</span>
       </span>
     );
-    if (id == null) return titleFactory(<BarsOutlined />, 'All');
+    if (id == null) return titleFactory(<BarsOutlined />, 'All Components');
     return queries.get('tag') != null
       ? titleFactory(<TagOutlined />, tags.find((t) => t.id === id)?.name)
       : titleFactory(
