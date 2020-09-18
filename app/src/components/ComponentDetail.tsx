@@ -49,7 +49,6 @@ const ComponentDetail: React.FC<Props> = ({
   const [newTagEditing, setNewTagEditing] = useState(false);
   const [newTagSubmitting, setNewTagSubmitting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [deleting, setDeleting] = useState(false);
 
   const handleChange = (value: string[]) => {
     setSelectedTags(value);
@@ -111,27 +110,6 @@ const ComponentDetail: React.FC<Props> = ({
   };
 
   const history = useHistory();
-  const handleDeleteClick = async () => {
-    try {
-      setDeleting(true);
-      await repo.componentDelete(component.id);
-      set((store) => {
-        const { [component.id]: _, rest } = store.components.byId[component.id];
-        store.components.byId = rest;
-        store.components.allIds = store.components.allIds.filter(
-          (id) => id !== component.id,
-        );
-      });
-      notification.success({ message: 'Your component deleted' });
-      if (onSubmitSuccess != null) onSubmitSuccess();
-      history.push('/');
-    } catch (e) {
-      console.log(e);
-      notification.error({ message: 'Sorry, something went wrong' });
-    } finally {
-      setDeleting(false);
-    }
-  };
 
   return (
     <Container>
@@ -191,7 +169,7 @@ const ComponentDetail: React.FC<Props> = ({
       </Row>
       <Row justify="center">
         <Button type="primary" loading={submitting} onClick={handleUpdateClick}>
-          Save Changes
+          Save
         </Button>
       </Row>
     </Container>

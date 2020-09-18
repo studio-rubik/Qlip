@@ -1,10 +1,29 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Row, Col, Card, Tag, Modal, PageHeader, Empty } from 'antd';
-import { TagFilled, GlobalOutlined, BarsOutlined } from '@ant-design/icons';
+import {
+  Row,
+  Col,
+  Card,
+  Tag,
+  Modal,
+  PageHeader,
+  Empty,
+  Menu,
+  Dropdown,
+  notification,
+} from 'antd';
+import {
+  TagFilled,
+  GlobalOutlined,
+  BarsOutlined,
+  EllipsisOutlined,
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+  FileTextOutlined,
+} from '@ant-design/icons';
 
 import color from '../common/color';
-import { useFetchComponents } from '../hooks/useRepository';
+import useRepository, { useFetchComponents } from '../hooks/useRepository';
 import { useStore } from '../store/';
 import styled from 'styled-components';
 
@@ -79,6 +98,63 @@ const Main = () => {
         );
   }, [location.search, tags, websites]);
 
+  const repo = useRepository();
+  const set = useStore((store) => store.set);
+
+  const [deleting, setDeleting] = useState(false);
+  const confirmDeleteFactory = (compID: string) => {
+    return () =>
+      Modal.confirm({
+        title: 'Delete Component?',
+        icon: <ExclamationCircleOutlined />,
+        content: "Associated components won't be deleted.",
+        onOk: async () => {
+          try {
+            setDeleting(true);
+            await repo.componentDelete(compID);
+            set((store) => {
+              delete store.components.byId[compID];
+              store.components.allIds = store.components.allIds.filter(
+                (id) => id !== compID,
+              );
+            });
+            notification.success({ message: 'Your component deleted' });
+          } catch (e) {
+            console.log(e);
+            notification.error({ message: 'Sorry, something went wrong' });
+          } finally {
+            setDeleting(false);
+          }
+        },
+      });
+  };
+
+  const moreActionFactory = (compID: string) => (
+    <Menu style={{ padding: '4px' }}>
+      <Menu.Item key="detail" icon={<FileTextOutlined />}>
+        <span
+          style={{ padding: '0 8px' }}
+          onClick={() => handleCardClick(compID)}
+        >
+          Detail
+        </span>
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item key="delete" icon={<CloseCircleOutlined />} danger>
+        <span
+          style={{ padding: '0 8px' }}
+          onClick={confirmDeleteFactory(compID)}
+        >
+          Delete
+        </span>
+      </Menu.Item>
+    </Menu>
+  );
+
+  const stopPropagation = (e: any) => {
+    e.stopPropagation();
+  };
+
   return (
     <>
       <PageHeader title={title} style={{ background: 'white' }} />
@@ -96,19 +172,30 @@ const Main = () => {
                     />
                   }
                   onClick={() => handleCardClick(comp.id)}
+                  bodyStyle={{ padding: 12 }}
                 >
-                  <div>
-                    <div>
-                      {websites.find((s) => s.id === comp.website)?.domain}
-                    </div>
-                    <div>
-                      {tags
-                        .filter((t) => comp.tagIds.includes(t.id))
-                        .map((t) => (
-                          <Tag key={t.id}>{t.name}</Tag>
-                        ))}
-                    </div>
-                  </div>
+                  <Card.Meta
+                    title={websites.find((s) => s.id === comp.website)?.domain}
+                    description={
+                      <div style={{ padding: '6px 0' }}>
+                        {tags
+                          .filter((t) => comp.tagIds.includes(t.id))
+                          .map((t) => (
+                            <Tag key={t.id}>{t.name}</Tag>
+                          ))}
+                      </div>
+                    }
+                  />
+                  <MoreButtonRow onClick={stopPropagation}>
+                    <Dropdown
+                      overlay={moreActionFactory(comp.id)}
+                      trigger={['click']}
+                    >
+                      <MoreButton>
+                        <EllipsisOutlined style={{ fontSize: 22 }} />
+                      </MoreButton>
+                    </Dropdown>
+                  </MoreButtonRow>
                 </Card>
               </Col>
             ))}
@@ -128,7 +215,6 @@ const Main = () => {
             component={selectedItems.component}
             file={selectedItems.file}
             website={selectedItems.website}
-            onSubmitSuccess={closeModal}
           />
         ) : null}
       </Modal>
@@ -142,6 +228,22 @@ const CardsContainer = styled.div`
 
 const CardImg = styled.img`
   image-rendering: -webkit-optimize-contrast;
+`;
+
+const MoreButtonRow = styled.div`
+  display: flex;
+  margin-top: 8px;
+  justify-content: flex-end;
+`;
+
+const MoreButton = styled.div`
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  padding: 2px;
+  :hover {
+    background: #0002;
+  }
 `;
 
 export default Main;
