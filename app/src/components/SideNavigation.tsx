@@ -141,16 +141,6 @@ function SideNavigation() {
           </Menu.SubMenu>
         </Menu>
       </Layout.Sider>
-      <Modal
-        title="Are you sure?"
-        visible={false}
-        // onOk={this.handleOk}
-        // onCancel={this.handleCancel}
-      >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-      </Modal>
     </>
   );
 }
@@ -182,7 +172,7 @@ const MoreButton = styled.div`
   visibility: hidden;
   transform: rotate(90deg);
   border-radius: 4px;
-  line-height: 24px;
+  width: 24px;
   justify-content: center;
   align-items: center;
 
