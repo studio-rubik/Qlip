@@ -29,6 +29,7 @@ const Main = () => {
   const selectedItems = useMemo(() => {
     if (selectedComponentID === '') return null;
     const component = components.find((c) => c.id === selectedComponentID);
+    if (component == null) return null;
     return {
       component,
       file: files.find((f) => f.component === component.id),

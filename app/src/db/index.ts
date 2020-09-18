@@ -23,6 +23,10 @@ export default class ServerRepository implements Repository {
     });
   }
 
+  componentDelete(id: string) {
+    return this.client.delete({ path: 'components/:id', params: [id] });
+  }
+
   tagsAll() {
     return this.client.get({ path: 'tags' });
   }

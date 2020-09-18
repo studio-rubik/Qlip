@@ -94,6 +94,13 @@ def components_get():
     )
 
 
+@app.route("/components/<id>", methods=["DELETE"])
+def components_delete(id: str):
+    models.ComponentTag.delete().where(models.ComponentTag.component == id).execute()
+    models.Component.delete_by_id(id)
+    return {}, 200
+
+
 @app.route("/tags", methods=["POST"])
 def tags_post():
     user_id = request.headers.get("DomClipper-User-ID")
