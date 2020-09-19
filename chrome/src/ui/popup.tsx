@@ -4,22 +4,31 @@ import ReactDOM from 'react-dom';
 import '../styles/popup.css';
 
 const App: React.FC = () => {
-  const [data, setData] = useState(0);
+  const [idToken, setIdToken] = useState('');
 
   useEffect(() => {
-    console.log(data);
-    chrome.runtime.sendMessage({ type: 'some', data: 'thing' });
-    // chrome.runtime.onMessage.addListener(function (request) {
-    //   if (request.msg === 'something_completed') {
-    //     //  To do something
-    //     setData(request.data.subject);
-    //   }
-    // });
+    chrome.runtime.sendMessage({ type: 'idToken' }, (resp) => {
+      setIdToken(resp.data.idToken);
+    });
   }, []);
+
+  const signIn = () => {
+    chrome.runtime.sendMessage({ type: 'signIn' }, (resp) => {
+      setIdToken(resp.data.idToken);
+    });
+  };
+
+  const enableCapture = () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0].id == null) return;
+      chrome.tabs.sendMessage(tabs[0].id, { type: 'toggle' });
+    });
+  };
+
   return (
-    <div className="popup-padded">
-      <h1>Hello React</h1>
-      <p>{data}</p>
+    <div>
+      {idToken === '' ? <button onClick={signIn}>Sign in</button> : null}
+      {idToken !== '' ? <button onClick={enableCapture}>Capture</button> : null}
     </div>
   );
 };

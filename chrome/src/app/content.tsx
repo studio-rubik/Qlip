@@ -114,7 +114,7 @@ function disableExtension() {
 
 let enabled = false;
 
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((msg) => {
   switch (msg.type) {
     case 'toggle':
       enabled = !enabled;

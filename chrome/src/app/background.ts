@@ -18,15 +18,9 @@ function publish(msg: any) {
   });
 }
 
-chrome.browserAction.onClicked.addListener((tab) => {
-  if (tab.id) {
-    chrome.tabs.sendMessage(tab.id, { type: 'toggle' });
-  }
-});
-
 let idToken = '';
 
-function startSignInFlow(res: any) {
+function startSignInFlow(resp: any) {
   const manifest = chrome.runtime.getManifest();
   if (manifest.oauth2 == null || manifest.oauth2.scopes == null) {
     throw 'Invalid manifest.json';
@@ -56,11 +50,18 @@ function startSignInFlow(res: any) {
       if (chrome.runtime.lastError) {
         console.log(chrome.runtime.lastError.message);
       } else {
-        idToken = redirectedTo?.split('#', 2)[1] ?? '';
+        idToken =
+          redirectedTo?.split('#', 2)[1]?.split('&')[0]?.split('=')[1] ?? '';
+        resp({ type: 'signIn', data: { idToken } });
         console.log(idToken);
       }
     },
   );
+}
+
+function fetchIdToken(resp: any) {
+  console.log(idToken);
+  resp({ type: 'idToken', data: { idToken } });
 }
 
 type CaptureMsg = {
@@ -104,13 +105,17 @@ async function componentAdd(msg: ComponentAddMsg) {
   });
 }
 
-chrome.runtime.onMessage.addListener((msg, _, res) => {
+chrome.runtime.onMessage.addListener((msg, _, resp) => {
+  console.log(msg);
   switch (msg.type) {
     case 'signIn':
-      startSignInFlow(res);
+      startSignInFlow(resp);
+      break;
+    case 'idToken':
+      fetchIdToken(resp);
       break;
     case 'capture':
-      handleCaptureMsg(msg, res);
+      handleCaptureMsg(msg, resp);
       break;
     case 'api.component.add':
       componentAdd(msg);
