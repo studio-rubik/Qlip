@@ -114,7 +114,7 @@ const ComponentDetail: React.FC<Props> = ({
     }
   };
 
-  const iconStyle = { fontSize: 18, marginRight: 10, color: color.primary };
+  const iconStyle = { fontSize: 18, marginRight: 10 };
 
   return (
     <Container>
