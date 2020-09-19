@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { message } from 'antd';
 import { useGoogleLogin, useGoogleLogout } from 'react-google-login';
 
 import { useStore } from '../store';
@@ -13,6 +14,7 @@ export default () => {
     set((store) => {
       store.idToken = resp.getAuthResponse().id_token;
     });
+    message.success('You are signed in!');
   };
 
   const handleFailure = (resp: any) => {
@@ -29,6 +31,7 @@ export default () => {
     set((store) => {
       store.idToken = '';
     });
+    message.success('You are signed out');
   };
 
   const { signIn } = useGoogleLogin({
