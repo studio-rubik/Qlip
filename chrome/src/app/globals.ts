@@ -1,1 +1,1 @@
-declare const API_URL: String;
+export declare const API_URL: string;

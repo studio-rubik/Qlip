@@ -28,19 +28,18 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
   };
 
   const handleSaveClick = async () => {
-    chrome.runtime.sendMessage(
-      {
-        type: 'api.component.add',
-        dataURL: imgURL,
-        domain: window.location.hostname,
-      },
-      (res) => {}
-    );
+    chrome.runtime.sendMessage({
+      type: 'api.component.add',
+      dataURL: imgURL,
+      domain: window.location.hostname,
+    });
   };
 
   return (
     <Modal
-      style={{ overlay: { backgroundColor: '#0008', zIndex: 99999999 } }}
+      style={{
+        overlay: { backgroundColor: '#0008', zIndex: 99999999 },
+      }}
       isOpen={true}
       onRequestClose={handleClose}
       shouldCloseOnOverlayClick={true}
@@ -48,7 +47,10 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
       <div>
         <Img
           src={imgURL}
-          style={{ width: originalSize.width, height: originalSize.height }}
+          style={{
+            width: originalSize.width,
+            height: originalSize.height,
+          }}
         />
       </div>
       <div>

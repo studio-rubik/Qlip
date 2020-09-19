@@ -7,17 +7,17 @@ const filesInDirectory = (dir) =>
           .map((e) =>
             e.isDirectory
               ? filesInDirectory(e)
-              : new Promise((resolve) => e.file(resolve))
-          )
+              : new Promise((resolve) => e.file(resolve)),
+          ),
       )
         .then((files) => [].concat(...files))
-        .then(resolve)
-    )
+        .then(resolve),
+    ),
   );
 
 const timestampForFilesInDirectory = (dir) =>
   filesInDirectory(dir).then((files) =>
-    files.map((f) => f.name + f.lastModifiedDate).join()
+    files.map((f) => f.name + f.lastModifiedDate).join(),
   );
 
 const reload = () => {

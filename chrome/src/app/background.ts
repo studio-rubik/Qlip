@@ -39,7 +39,7 @@ type ComponentAddMsg = {
 
 function handleCaptureMsg(
   msg: CaptureMsg,
-  res: (respData: CaptureMsgResp) => void
+  res: (respData: CaptureMsgResp) => void,
 ) {
   chrome.tabs.query({ active: true }, (tab) => {
     chrome.tabs.captureVisibleTab(
@@ -49,7 +49,7 @@ function handleCaptureMsg(
         crop(image, msg.area, msg.dpr, msg.dpr, 'png', (cropped) => {
           res({ type: 'capture', data: cropped });
         });
-      }
+      },
     );
   });
 }
@@ -91,28 +91,65 @@ function crop(
   dpr,
   preserve,
   format,
-  callback: (data: string) => void
+  callback: (data: string) => void,
 ) {
-  var top = area.y * dpr;
-  var left = area.x * dpr;
-  var width = area.w * dpr;
-  var height = area.h * dpr;
-  var w = dpr !== 1 && preserve ? width : area.w;
-  var h = dpr !== 1 && preserve ? height : area.h;
+  const top = area.y * dpr;
+  const left = area.x * dpr;
+  const width = area.w * dpr;
+  const height = area.h * dpr;
+  const w = dpr !== 1 && preserve ? width : area.w;
+  const h = dpr !== 1 && preserve ? height : area.h;
 
   let canvas: HTMLCanvasElement = null;
   if (!canvas) {
     canvas = document.createElement('canvas');
     document.body.appendChild(canvas);
   }
-  canvas.width = w;
-  canvas.height = h;
 
   const img = new Image();
   img.onload = () => {
-    var context = canvas.getContext('2d');
+    const context = canvas.getContext('2d');
     context.drawImage(img, left, top, width, height, 0, 0, w, h);
     callback(canvas.toDataURL(`image/${format}`));
   };
   img.src = image;
+}
+
+function startLoginFlow() {
+  // Using chrome.identity
+  const manifest = chrome.runtime.getManifest();
+
+  const clientId = encodeURIComponent(manifest.oauth2.client_id);
+  const scopes = encodeURIComponent(manifest.oauth2.scopes.join(' '));
+  const redirectUri = encodeURIComponent(
+    'https://' + chrome.runtime.id + '.chromiumapp.org',
+  );
+  const url =
+    'https://accounts.google.com/o/oauth2/auth' +
+    '?client_id=' +
+    clientId +
+    '&response_type=id_token' +
+    '&access_type=offline' +
+    '&redirect_uri=' +
+    redirectUri +
+    '&scope=' +
+    scopes;
+
+  chrome.identity.launchWebAuthFlow(
+    {
+      url: url,
+      interactive: true,
+    },
+    function (redirectedTo) {
+      if (chrome.runtime.lastError) {
+        // Example: Authorization page could not be loaded.
+        console.log(chrome.runtime.lastError.message);
+      } else {
+        const response = redirectedTo.split('#', 2)[1];
+
+        // Example: id_token=<YOUR_BELOVED_ID_TOKEN>&authuser=0&hd=<SOME.DOMAIN.PL>&session_state=<SESSION_SATE>&prompt=<PROMPT>
+        console.log(response);
+      }
+    },
+  );
 }

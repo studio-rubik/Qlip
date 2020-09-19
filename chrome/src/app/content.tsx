@@ -24,7 +24,7 @@ type OutlineStyles = {
 
 function tilStyleApplied(
   element: HTMLElement,
-  style: OutlineStyles
+  style: OutlineStyles,
 ): Promise<void> {
   return new Promise((resolve) => {
     const interval = setInterval(() => {
@@ -88,9 +88,9 @@ function handleMouseOver(e: MouseEvent) {
         document.body.classList.add('locked');
         ReactDOM.render(
           <App imgURL={res.data} originalSize={rect} />,
-          reactRoot
+          reactRoot,
         );
-      }
+      },
     );
   }
 
