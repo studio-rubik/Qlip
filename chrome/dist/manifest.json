@@ -10,7 +10,8 @@
     "128": "icons/icon128.png"
   },
   "browser_action": {
-    "default_title": "TSRWPCX"
+    "default_title": "TSRWPCX",
+    "default_popup": "popup.html"
   },
   "default_locale": "en",
   "background": {
@@ -30,5 +31,9 @@
       "matches": ["https://*/*"],
       "js": ["js/content.js"]
     }
-  ]
+  ],
+  "oauth2": {
+    "client_id": "45191155617-ejkqtnouj8keikp8cia1mk84virh3acr.apps.googleusercontent.com",
+    "scopes": ["openid", "email", "profile"]
+  }
 }
