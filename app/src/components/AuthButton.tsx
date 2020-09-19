@@ -1,24 +1,21 @@
 import React from 'react';
-import { Spin, Button } from 'antd';
+import { Button } from 'antd';
 
 import { useStore } from '../store';
-import useAuth from '../hooks/useAuth';
 import GoogleIcon from './GoogleIcon';
 
 const AuthButton: React.FC = () => {
-  const { signIn, signOut } = useAuth();
+  const signIn = useStore((store) => store.signIn);
+  const signOut = useStore((store) => store.signOut);
   const token = useStore((store) => store.idToken);
-  const loaded = useStore((store) => store.authLoaded);
-  console.log(loaded, token);
-  if (!loaded) return <Spin spinning />;
 
   return token === '' ? (
-    <Button size="large" onClick={signIn}>
+    <Button size="large" onClick={signIn ?? undefined}>
       <GoogleIcon />
-      <span style={{ color: '#777' }}>Sign in with Google</span>
+      <span style={{ color: '#777', fontSize: 15 }}>Sign in with Google</span>
     </Button>
   ) : (
-    <button onClick={signOut}>Sign out</button>
+    <button onClick={signOut ?? undefined}>Sign out</button>
   );
 };
 

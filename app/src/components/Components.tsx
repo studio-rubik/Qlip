@@ -10,6 +10,7 @@ import {
   Empty,
   Menu,
   Dropdown,
+  Spin,
   notification,
 } from 'antd';
 import {
@@ -159,6 +160,8 @@ const Main = () => {
     e.stopPropagation();
   };
 
+  const loaded = true;
+
   return (
     <>
       <PageHeader
@@ -166,66 +169,74 @@ const Main = () => {
         style={{ background: 'white' }}
         extra={[<AuthButton key="auth" />]}
       />
-      <CardsContainer>
-        {components.length > 0 ? (
-          <Row gutter={[16, 16]}>
-            {components.map((comp) => (
-              <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
-                <Card
-                  hoverable
-                  cover={
-                    <CardImg
-                      src={files.find((f) => f.component === comp.id)?.url}
-                      alt=""
-                    />
-                  }
-                  onClick={() => handleCardClick(comp.id)}
-                  bodyStyle={{ padding: 12 }}
-                >
-                  <Card.Meta
-                    title={websites.find((s) => s.id === comp.website)?.domain}
-                    description={
-                      <div style={{ padding: '6px 0' }}>
-                        {tags
-                          .filter((t) => comp.tagIds.includes(t.id))
-                          .map((t) => (
-                            <Tag key={t.id}>{t.name}</Tag>
-                          ))}
-                      </div>
-                    }
-                  />
-                  <MoreButtonRow onClick={stopPropagation}>
-                    <Dropdown
-                      overlay={moreActionFactory(comp.id)}
-                      trigger={['click']}
+      {loaded ? (
+        <>
+          <CardsContainer>
+            {components.length > 0 ? (
+              <Row gutter={[16, 16]}>
+                {components.map((comp) => (
+                  <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
+                    <Card
+                      hoverable
+                      cover={
+                        <CardImg
+                          src={files.find((f) => f.component === comp.id)?.url}
+                          alt=""
+                        />
+                      }
+                      onClick={() => handleCardClick(comp.id)}
+                      bodyStyle={{ padding: 12 }}
                     >
-                      <MoreButton>
-                        <EllipsisOutlined style={{ fontSize: 22 }} />
-                      </MoreButton>
-                    </Dropdown>
-                  </MoreButtonRow>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        ) : (
-          <Empty description="No Component Found" />
-        )}
-      </CardsContainer>
-      <Modal
-        isOpen={modalOpen}
-        onRequestClose={closeModal}
-        shouldCloseOnOverlayClick
-        style={{ overlay: { background: '#0008' } }}
-      >
-        {selectedItems != null ? (
-          <ComponentDetail
-            component={selectedItems.component}
-            file={selectedItems.file}
-            website={selectedItems.website}
-          />
-        ) : null}
-      </Modal>
+                      <Card.Meta
+                        title={
+                          websites.find((s) => s.id === comp.website)?.domain
+                        }
+                        description={
+                          <div style={{ padding: '6px 0' }}>
+                            {tags
+                              .filter((t) => comp.tagIds.includes(t.id))
+                              .map((t) => (
+                                <Tag key={t.id}>{t.name}</Tag>
+                              ))}
+                          </div>
+                        }
+                      />
+                      <MoreButtonRow onClick={stopPropagation}>
+                        <Dropdown
+                          overlay={moreActionFactory(comp.id)}
+                          trigger={['click']}
+                        >
+                          <MoreButton>
+                            <EllipsisOutlined style={{ fontSize: 22 }} />
+                          </MoreButton>
+                        </Dropdown>
+                      </MoreButtonRow>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            ) : (
+              <Empty description="No Component Found" />
+            )}
+          </CardsContainer>
+          <Modal
+            isOpen={modalOpen}
+            onRequestClose={closeModal}
+            shouldCloseOnOverlayClick
+            style={{ overlay: { background: '#0008' } }}
+          >
+            {selectedItems != null ? (
+              <ComponentDetail
+                component={selectedItems.component}
+                file={selectedItems.file}
+                website={selectedItems.website}
+              />
+            ) : null}
+          </Modal>
+        </>
+      ) : (
+        <Spin />
+      )}
     </>
   );
 };

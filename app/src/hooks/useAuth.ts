@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useGoogleLogin, useGoogleLogout } from 'react-google-login';
 
 import { useStore } from '../store';
@@ -7,6 +8,7 @@ const clientId =
 
 export default () => {
   const set = useStore((store) => store.set);
+
   const handleSuccess = (resp: any) => {
     set((store) => {
       store.idToken = resp.getAuthResponse().id_token;
@@ -24,7 +26,6 @@ export default () => {
   };
 
   const handleLogoutSuccess = () => {
-    console.log('logout');
     set((store) => {
       store.idToken = '';
     });
@@ -40,9 +41,16 @@ export default () => {
     onFailure: handleFailure,
     onAutoLoadFinished: handleAutoLoadFinished,
   });
+
   const { signOut } = useGoogleLogout({
     clientId,
     onLogoutSuccess: handleLogoutSuccess,
   });
-  return { signIn, signOut };
+
+  useEffect(() => {
+    set((store) => {
+      store.signIn = signIn;
+      store.signOut = signOut;
+    });
+  }, [set, signIn, signOut]);
 };

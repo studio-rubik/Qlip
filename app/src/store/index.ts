@@ -9,6 +9,8 @@ export type State = {
   initialize: () => void;
   idToken: string;
   authLoaded: boolean;
+  signIn: (() => void) | null;
+  signOut: (() => void) | null;
   components: APIResponseEntity<any>;
   tags: APIResponseEntity<any>;
   componentFiles: APIResponseEntity<any>;
@@ -22,6 +24,8 @@ const emptyEntity = { byId: {}, allIds: [] };
 const initialState = {
   idToken: '',
   authLoaded: false,
+  signIn: null,
+  signOut: null,
   components: emptyEntity,
   tags: emptyEntity,
   componentFiles: emptyEntity,
