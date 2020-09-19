@@ -166,7 +166,7 @@ const Main = () => {
     <>
       <PageHeader
         title={title}
-        style={{ background: 'white' }}
+        style={{ background: 'white', padding: '10px 20px' }}
         extra={[<AuthButton key="auth" />]}
       />
       {loaded ? (
