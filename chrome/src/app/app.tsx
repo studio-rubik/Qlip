@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Modal from 'react-modal';
 
 import '../styles/app.css';
+import { API_URL } from './globals';
 
 type Props = {
   imgURL: string;
@@ -18,13 +19,18 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
 
   useEffect(() => {
     return () => {
-      document.getElementById('dc-root').style.display = 'none';
+      const root = document.getElementById('dc-root');
+      if (root == null) return;
+      root.style.display = 'none';
       document.body.classList.remove('locked');
     };
   }, []);
 
   const handleClose = () => {
-    ReactDOM.unmountComponentAtNode(document.getElementById('dc-root'));
+    const root = document.getElementById('dc-root');
+    if (root != null) {
+      ReactDOM.unmountComponentAtNode(root);
+    }
   };
 
   const handleSaveClick = async () => {
