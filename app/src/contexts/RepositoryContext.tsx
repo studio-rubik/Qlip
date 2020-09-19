@@ -10,8 +10,11 @@ const serverRepository = new ServerRepository(
 );
 serverRepository.client.afterResponse((resp) => {
   if (!resp.ok) {
-    if (resp.status === 404) {
-      throw new errors.RepositoryNotFound();
+    switch (resp.status) {
+      case 401:
+        throw new errors.RepositoryUnauthorized();
+      case 404:
+        throw new errors.RepositoryNotFound();
     }
     throw new errors.RepositoryError('http status is not 2xx');
   }

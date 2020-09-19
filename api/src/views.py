@@ -1,10 +1,10 @@
 import typing
-from flask import request, abort
+from flask import request, abort, g
 
 from .app import app
 from .auth import require_auth
 from .utils import make_response
-from . import models
+from . import models, exceptions
 
 
 class Entity:
@@ -17,6 +17,11 @@ class Entity:
 
     def to_dict(self):
         return self._raw
+
+
+@app.errorhandler(exceptions.AuthError)
+def handle_unauthorized_request(e):
+    return {}, 401
 
 
 @app.before_request
@@ -52,6 +57,7 @@ def files():
 
 
 @app.route("/components", methods=["POST"])
+@require_auth
 def components_post():
     user_id = request.headers.get("DomClipper-User-ID")
     file = request.files.get("file")
@@ -68,14 +74,14 @@ def components_post():
 
 
 @app.route("/components", methods=["GET"])
+@require_auth
 def components_get():
-    user_id = request.headers.get("DomClipper-User-ID")
     tag = request.args.get("tag")
     site = request.args.get("website")
 
     components = (
         models.Component.select()
-        .where(models.Component.user_id == user_id)
+        .where(models.Component.user_id == g.user.id)
         .order_by(models.Component.created_at.desc())
     )
     if tag is not None:
@@ -95,6 +101,7 @@ def components_get():
 
 
 @app.route("/components/<id>", methods=["DELETE"])
+@require_auth
 def components_delete(id: str):
     models.ComponentTag.delete().where(models.ComponentTag.component == id).execute()
     models.Component.delete_by_id(id)
@@ -102,6 +109,7 @@ def components_delete(id: str):
 
 
 @app.route("/tags", methods=["POST"])
+@require_auth
 def tags_post():
     user_id = request.headers.get("DomClipper-User-ID")
     req = request.get_json()
@@ -110,6 +118,7 @@ def tags_post():
 
 
 @app.route("/tags", methods=["GET"])
+@require_auth
 def tags_get():
     user_id = request.headers.get("DomClipper-User-ID")
     tags = models.Tag.select().where(
@@ -119,6 +128,7 @@ def tags_get():
 
 
 @app.route("/tags/<id>", methods=["DELETE"])
+@require_auth
 def tags_delete(id: str):
     models.ComponentTag.delete().where(models.ComponentTag.tag == id).execute()
     models.Tag.delete_by_id(id)
@@ -126,6 +136,7 @@ def tags_delete(id: str):
 
 
 @app.route("/websites", methods=["GET"])
+@require_auth
 def websites_get():
     user_id = request.headers.get("DomClipper-User-ID")
     sites = (
@@ -141,6 +152,7 @@ def websites_get():
 
 # tag_ids are comma separated ids.
 @app.route("/components/<component_id>/tags/<tag_ids>", methods=["POST"])
+@require_auth
 def component_tags_post(component_id: str, tag_ids: str):
     comp = models.Component.get_or_none(models.Component.id == component_id)
     tags = models.Tag.select().where(models.Tag.id.in_(tag_ids.split(",")))

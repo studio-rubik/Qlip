@@ -1,8 +1,7 @@
 from functools import wraps
-from urllib.request import urlopen
-import json
 from flask import current_app as app, request, g
-from jose import jwt
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 from .exceptions import AuthError
 from .domain import User
@@ -50,86 +49,6 @@ def get_token_auth_header():
     return token
 
 
-def fetch_keys():
-    jsonurl = urlopen(
-        "https://" + app.config["AUTH0_DOMAIN"] + "/.well-known/jwks.json"
-    )
-    return json.loads(jsonurl.read())
-
-
-jwks = None
-
-
-def get_rsa_key(token):
-    unverified_header = jwt.get_unverified_header(token)
-    rsa_key = {}
-    for key in jwks["keys"]:
-        if key["kid"] == unverified_header["kid"]:
-            rsa_key = {
-                "kty": key["kty"],
-                "kid": key["kid"],
-                "use": key["use"],
-                "n": key["n"],
-                "e": key["e"],
-            }
-    return rsa_key
-
-
-def try_decode(token, retry=False):
-    global jwks
-    if not retry:
-        if jwks is None:
-            jwks = fetch_keys()
-    else:
-        jwks = fetch_keys()
-
-    rsa_key = get_rsa_key(token)
-    if rsa_key:
-        try:
-            return jwt.decode(
-                token,
-                rsa_key,
-                algorithms=ALGORITHMS,
-                audience=app.config["AUTH0_API_AUDIENCE"],
-                issuer=f"https://{app.config['AUTH0_DOMAIN']}/",
-            )
-        except jwt.ExpiredSignatureError:
-            raise AuthError(
-                {"code": "token_expired", "description": "token is expired"}, 401
-            )
-        except jwt.JWTClaimsError:
-            raise AuthError(
-                {
-                    "code": "invalid_claims",
-                    "description": "incorrect claims,"
-                    "please check the audience and issuer",
-                },
-                401,
-            )
-        except Exception:
-            if not retry:
-                return try_decode(token, retry=True)
-            else:
-                raise AuthError(
-                    {
-                        "code": "invalid_header",
-                        "description": "Unable to parse authentication token.",
-                    },
-                    400,
-                )
-    else:
-        if not retry:
-            return try_decode(token, retry=True)
-        else:
-            raise AuthError(
-                {
-                    "code": "invalid_header",
-                    "description": "Unable to find appropriate key",
-                },
-                400,
-            )
-
-
 def require_auth(f):
     """Determines if the access token is valid
     """
@@ -137,8 +56,12 @@ def require_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = get_token_auth_header()
-        payload = try_decode(token)
-        g.user = User(id=payload["sub"])
-        return f(*args, **kwargs)
+        try:
+            idinfo = id_token.verify_oauth2_token(token, requests.Request())
+            userid = idinfo["sub"]
+            g.user = User(id=userid)
+            return f(*args, **kwargs)
+        except ValueError:
+            raise AuthError
 
     return decorated
