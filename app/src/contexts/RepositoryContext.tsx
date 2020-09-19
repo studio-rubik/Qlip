@@ -1,8 +1,9 @@
-import React, { createContext, useEffect, useState } from 'react';
-import ServerRepository from '../db';
+import React, { useEffect, createContext } from 'react';
 
+import ServerRepository from '../db';
 import * as errors from '../common/errors';
 import Repository from '../interface/repository';
+import { useStore } from '../store';
 
 const serverRepository = new ServerRepository(
   process.env.REACT_APP_BACKEND_URL!,
@@ -20,6 +21,12 @@ serverRepository.client.afterResponse((resp) => {
 export const RepositoryContext = createContext<Repository>(serverRepository);
 
 export const RepositoryCtxProvider: React.FC = ({ children }) => {
+  const token = useStore((store) => store.idToken);
+
+  useEffect(() => {
+    serverRepository.client.token = token;
+  }, [token]);
+
   return (
     <RepositoryContext.Provider value={serverRepository}>
       {children}

@@ -7,6 +7,8 @@ import { APIResponseEntity } from '../interface/repository';
 export type State = {
   set: (fn: SetState) => void;
   initialize: () => void;
+  idToken: string;
+  authLoaded: boolean;
   components: APIResponseEntity<any>;
   tags: APIResponseEntity<any>;
   componentFiles: APIResponseEntity<any>;
@@ -18,6 +20,8 @@ type SetState = (state: State) => void;
 const emptyEntity = { byId: {}, allIds: [] };
 
 const initialState = {
+  idToken: '',
+  authLoaded: false,
   components: emptyEntity,
   tags: emptyEntity,
   componentFiles: emptyEntity,

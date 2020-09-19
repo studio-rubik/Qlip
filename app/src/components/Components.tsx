@@ -29,6 +29,7 @@ import { useStore } from '../store/';
 import styled from 'styled-components';
 
 import ComponentDetail from './ComponentDetail';
+import AuthButton from './AuthButton';
 
 const { confirm } = AntModal;
 
@@ -160,7 +161,11 @@ const Main = () => {
 
   return (
     <>
-      <PageHeader title={title} style={{ background: 'white' }} />
+      <PageHeader
+        title={title}
+        style={{ background: 'white' }}
+        extra={[<AuthButton key="auth" />]}
+      />
       <CardsContainer>
         {components.length > 0 ? (
           <Row gutter={[16, 16]}>
