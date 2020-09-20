@@ -126,6 +126,16 @@ chrome.runtime.onMessage.addListener((msg, _, resp) => {
   return true;
 });
 
+chrome.commands.onCommand.addListener((command) => {
+  if (command === 'capture.toggle') {
+    if (idToken === '') return;
+    chrome.tabs.query({ active: true }, (tab) => {
+      if (tab[0].id == null) return;
+      chrome.tabs.sendMessage(tab[0].id, { type: 'capture.toggle' });
+    });
+  }
+});
+
 function crop(
   image: any,
   area: { x: number; y: number; w: number; h: number },

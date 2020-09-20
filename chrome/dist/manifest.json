@@ -35,5 +35,14 @@
   "oauth2": {
     "client_id": "45191155617-ejkqtnouj8keikp8cia1mk84virh3acr.apps.googleusercontent.com",
     "scopes": ["openid", "email", "profile"]
+  },
+  "commands": {
+    "capture.toggle": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Toggle Capture`"
+    }
   }
 }
