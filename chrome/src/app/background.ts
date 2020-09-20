@@ -144,6 +144,9 @@ function crop(
   const canvas = document.createElement('canvas');
   document.body.appendChild(canvas);
 
+  canvas.width = w;
+  canvas.height = h;
+
   const img = new Image();
   img.onload = () => {
     const context = canvas.getContext('2d');
