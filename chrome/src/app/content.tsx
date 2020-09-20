@@ -28,7 +28,11 @@ function tilStyleApplied(
 ): Promise<void> {
   return new Promise((resolve) => {
     const interval = setInterval(() => {
-      if (Object.entries(style).every(([k, v]) => element.style[k] === v)) {
+      if (
+        Object.entries(style).every(
+          ([k, v]) => element.style[k as keyof CSSStyleDeclaration] === v,
+        )
+      ) {
         resolve();
         clearInterval(interval);
         return;
@@ -84,7 +88,9 @@ function handleMouseOver(e: MouseEvent) {
         elm.removeEventListener('click', handleClick);
         document.removeEventListener('mouseover', handleMouseOver);
         const reactRoot = document.getElementById('dc-root');
-        reactRoot.style.display = 'block';
+        if (reactRoot != null) {
+          reactRoot.style.display = 'block';
+        }
         document.body.classList.add('locked');
         ReactDOM.render(
           <App imgURL={res.data} originalSize={rect} />,
@@ -94,7 +100,7 @@ function handleMouseOver(e: MouseEvent) {
     );
   }
 
-  function remove(l: MouseEvent) {
+  function remove() {
     recover();
     elm.removeEventListener('click', handleClick);
     elm.removeEventListener('mouseout', remove);
