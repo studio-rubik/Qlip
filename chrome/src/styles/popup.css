@@ -1,11 +1,48 @@
 body {
-    min-width: 400px;
-    min-height: 400px;
+    min-width: 200px;
 }
 
-.popup-padded {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
+.container {
+    display: flex;
+    justify-content: center;
+    padding: 5px;
+}
+
+button {
+    height: 30px;
+    box-sizing: border-box;
+    background: white;
+    border: solid 1px #888;
+    border-radius: 4px;
+    padding: 6px;
+    font-size: 14px;
+    vertical-align: middle;
+    color: #666;
+    cursor: pointer;
+    transition: color 500ms;
+}
+
+button span.icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+button img.icon {
+    display: inline-block;
+    vertical-align: text-bottom;
+    margin-right: 6px;
+    width: 16px;
+    height: 16px;
+}
+
+button:hover {
+    color: black;
+}
+
+.keybinding {
+    color: #666;
+    font-size: 14px;
+    vertical-align: middle;
+    padding: 0 10px;
 }

@@ -2,12 +2,23 @@ import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import '../styles/popup.css';
+import GoogleIcon from './GoogleIcon';
+
+let isMac = false;
+if (navigator.appVersion.indexOf('Mac') != -1) {
+  isMac = true;
+}
 
 const App: React.FC = () => {
   const [idToken, setIdToken] = useState('');
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
+    chrome.runtime.onMessage.addListener((msg) => {
+      if (msg.type === 'capture.toggle.complete') {
+        window.close();
+      }
+    });
     chrome.runtime.sendMessage({ type: 'idToken' }, (resp) => {
       setIdToken(resp.data.idToken);
     });
@@ -26,16 +37,29 @@ const App: React.FC = () => {
   };
 
   const toggleCapture = () => {
-    chrome.runtime.sendMessage({ type: 'capture.toggle' }, () => {
-      window.close();
-    });
+    chrome.runtime.sendMessage({ type: 'capture.toggle.request' });
   };
 
+  const keybinding = `[${isMac ? '\u2318' : 'Ctrl'} Shift S]`;
+
   return (
-    <div>
-      {idToken === '' ? <button onClick={signIn}>Sign in</button> : null}
+    <div className="container">
+      {idToken === '' ? (
+        <button className="sign-in" onClick={signIn}>
+          <span className="icon">
+            <GoogleIcon />
+          </span>
+          Sign in with Google
+        </button>
+      ) : null}
       {idToken !== '' ? (
-        <button onClick={toggleCapture}>{enabled ? 'Stop' : 'Capture'}</button>
+        <div>
+          <button onClick={toggleCapture}>
+            <img src="/img/area.png" className="icon" />
+            {enabled ? 'Stop' : 'Capture'}
+          </button>
+          <span className="keybinding">{keybinding}</span>
+        </div>
       ) : null}
     </div>
   );

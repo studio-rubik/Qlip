@@ -134,14 +134,18 @@ async function componentAdd(msg: ComponentAddMsg) {
   });
 }
 
-function toggleCapture(respond?: () => void) {
+function toggleCapture() {
   if (idToken === '') return;
   chrome.tabs.query({ active: true }, async (tab) => {
     if (tab[0].id == null) return;
     await injectContentScript();
-    chrome.tabs.sendMessage(tab[0].id, { type: 'capture.toggle' }, () => {
-      respond && respond();
-    });
+    chrome.tabs.sendMessage(
+      tab[0].id,
+      { type: 'capture.toggle.request' },
+      () => {
+        chrome.runtime.sendMessage({ type: 'capture.toggle.complete' });
+      },
+    );
   });
 }
 
@@ -154,8 +158,8 @@ chrome.runtime.onMessage.addListener((msg, _, respond) => {
     case 'idToken':
       fetchIdToken(respond);
       break;
-    case 'capture.toggle':
-      toggleCapture(respond);
+    case 'capture.toggle.request':
+      toggleCapture();
       break;
     case 'capture.execute':
       handleCaptureMsg(msg, respond);

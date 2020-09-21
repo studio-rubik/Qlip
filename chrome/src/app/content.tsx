@@ -118,15 +118,15 @@ function disableExtension() {
 
 let enabled = false;
 
-chrome.runtime.onMessage.addListener((msg, _, resp) => {
+chrome.runtime.onMessage.addListener((msg, _, respond) => {
   switch (msg.type) {
     case 'capture.get':
-      resp({ type: 'capture.get', data: { value: enabled } });
+      respond({ type: 'capture.get', data: { value: enabled } });
       break;
-    case 'capture.toggle':
+    case 'capture.toggle.request':
       enabled = !enabled;
       enabled ? enableExtension() : disableExtension();
-      resp({ type: 'capture.toggle', data: { value: enabled } });
+      respond();
       break;
     case 'api.component.add':
       break;

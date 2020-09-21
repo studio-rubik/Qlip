@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import styled from 'styled-components';
 import Modal from 'react-modal';
 
 import '../styles/app.css';
@@ -51,7 +50,7 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
       shouldCloseOnOverlayClick={true}
     >
       <div>
-        <Img
+        <img
           src={imgURL}
           style={{
             width: originalSize.width,
@@ -65,15 +64,5 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
     </Modal>
   );
 };
-
-const Dim = styled.div`
-  height: 500px;
-  width: 100%;
-`;
-
-const Img = styled.img`
-  border-radius: 6px;
-  box-shadow: 0px 0px 7px 0 #0005;
-`;
 
 export default App;
