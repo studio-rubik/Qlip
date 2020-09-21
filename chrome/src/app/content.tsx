@@ -3,15 +3,27 @@ import ReactDOM from 'react-dom';
 
 import App from './app';
 
+const MARGIN = 20;
+
+let selected: HTMLElement | null = null;
+let reactRoot: HTMLDivElement | null = null;
+let instruction: HTMLDivElement | null = null;
 let savedOutline = '';
 let savedOffset = '';
 let savedZIndex = '';
 
 function init() {
-  const reactRoot = document.createElement('div');
+  reactRoot = document.createElement('div');
   reactRoot.style.display = 'none';
   reactRoot.setAttribute('id', 'dc-root');
+  instruction = document.createElement('div');
+  instruction.innerText = 'Press S to capture';
+  instruction.addEventListener('click', () => {
+    instruction!.style.display = 'none';
+  });
+  instruction.setAttribute('id', 'dc-instruction');
   document.body.appendChild(reactRoot);
+  document.body.appendChild(instruction);
 }
 
 type OutlineStyles = {
@@ -37,25 +49,6 @@ function tilStyleApplied(
       }
     }, 50);
   });
-}
-
-const MARGIN = 20;
-
-let selected: HTMLElement | null = null;
-
-function recover(elm: HTMLElement) {
-  if (elm) {
-    elm.style.outline = savedOutline;
-    elm.style.outlineOffset = savedOffset;
-    elm.style.zIndex = savedZIndex;
-  }
-  savedOutline = '';
-  savedOffset = '';
-  savedZIndex = '';
-}
-
-function handleMouseOut(e: MouseEvent) {
-  recover(e.target as HTMLElement);
 }
 
 async function capture() {
@@ -84,7 +77,6 @@ async function capture() {
       enabled = false;
       selected.removeEventListener('click', capture);
       document.removeEventListener('mouseover', handleMouseOver);
-      const reactRoot = document.getElementById('dc-root');
       if (reactRoot != null) {
         reactRoot.style.display = 'block';
       }
@@ -93,30 +85,63 @@ async function capture() {
   );
 }
 
+function recover(elm: HTMLElement) {
+  if (elm) {
+    elm.style.outline = savedOutline;
+    elm.style.outlineOffset = savedOffset;
+    elm.style.zIndex = savedZIndex;
+  }
+  savedOutline = '';
+  savedOffset = '';
+  savedZIndex = '';
+}
+
 function handleMouseOver(e: MouseEvent) {
   selected = e.target as HTMLElement;
   savedOutline = selected.style.outline;
   savedOffset = selected.style.outlineOffset;
   savedZIndex = selected.style.zIndex;
-  selected.style.outline = '#619ec988 solid 5px';
+  const color = e.target === instruction ? '#db373788' : '#619ec988';
+  selected.style.outline = `${color} solid 5px`;
   selected.style.outlineOffset = '-5px';
   selected.style.zIndex = '100000';
+}
+
+function handleMouseOut(e: MouseEvent) {
+  recover(e.target as HTMLElement);
+}
+
+function handleKeyDown(e: KeyboardEvent) {
+  switch (e.key) {
+    case 's':
+      capture();
+      break;
+    case 'Escape':
+      disableExtension();
+      break;
+  }
 }
 
 let enabled = false;
 
 function enableExtension() {
+  if (instruction) {
+    instruction.style.display = 'block';
+  }
   document.addEventListener('mouseover', handleMouseOver);
   document.addEventListener('mouseout', handleMouseOut);
-  document.addEventListener('click', capture);
+  document.addEventListener('keydown', handleKeyDown);
   enabled = true;
 }
 
 function disableExtension() {
   selected && recover(selected);
+  if (instruction) {
+    instruction.style.display = 'none';
+  }
   document.removeEventListener('mouseover', handleMouseOver);
   document.removeEventListener('mouseout', handleMouseOut);
-  document.removeEventListener('click', capture);
+  document.removeEventListener('keydown', handleKeyDown);
   enabled = false;
 }
 

@@ -3,3 +3,13 @@
     top: 0;
     left: 0;
 }
+
+#dc-instruction {
+    position: fixed;
+    bottom: 5px;
+    right: 12px;
+    font-size: 26px;
+    color: #777;
+    z-index: 9999999;
+    cursor: pointer;
+}
