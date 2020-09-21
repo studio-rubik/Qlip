@@ -84,7 +84,7 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
             </IconButton>
           </div>
           <div style={errorStyle}>
-            {true ? 'Sorry, something went wrong.' : null}
+            {error ? 'Sorry, something went wrong.' : null}
           </div>
         </div>
       </Modal>
