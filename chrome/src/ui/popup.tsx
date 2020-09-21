@@ -55,7 +55,7 @@ const App: React.FC = () => {
       {idToken !== '' ? (
         <div>
           <IconButton src="/img/area.png" onClick={toggleCapture}>
-            Capture
+            {enabled ? 'Stop' : 'Capture'}
           </IconButton>
           <span className="keybinding">{keybinding}</span>
         </div>
