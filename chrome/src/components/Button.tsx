@@ -28,7 +28,7 @@ const Button: React.FC<Props> = ({ children, onClick }) => {
 };
 
 const buttonStyle: CSSProperties = {
-  fontFamily: 'Arial,"Helvetica Neue",Helvetica,sans-serif;',
+  fontFamily: 'Arial,"Helvetica Neue",Helvetica,sans-serif',
   height: 30,
   boxSizing: 'border-box',
   background: 'white',
