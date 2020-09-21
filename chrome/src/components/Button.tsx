@@ -41,7 +41,7 @@ const buttonStyle: CSSProperties = {
   transition: 'color 500ms',
 
   // Protect from website's css.
-  lineHeight: 1,
+  lineHeight: '14px',
   textTransform: 'none',
 };
 
