@@ -57,6 +57,9 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
     <>
       <Modal
         style={{
+          // padding: 20px is added only when content overflows.
+          // Override it to always padding: 20px by containerStyle.
+          content: { width: '90vw', padding: 0 },
           overlay: { backgroundColor: '#0008', zIndex: 99999999 },
         }}
         isOpen={true}
@@ -69,8 +72,6 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
               src={imgURL}
               style={{
                 ...imgStyle,
-                width: originalSize.width,
-                height: originalSize.height,
               }}
             />
           </div>
@@ -96,11 +97,12 @@ const containerStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
+  padding: 20,
 };
 
 const imgStyle: CSSProperties = {
   maxWidth: '100%',
-  maxHeight: '100%',
+  height: 'auto',
   marginBottom: 50,
 };
 
