@@ -41,81 +41,84 @@ function tilStyleApplied(
 
 const MARGIN = 20;
 
-function handleMouseOver(e: MouseEvent) {
-  const elm = e.target as HTMLElement;
-  savedOutline = elm.style.outline;
-  savedOffset = elm.style.outlineOffset;
-  savedZIndex = elm.style.zIndex;
-  elm.style.outline = '#619ec988 solid 5px';
-  elm.style.outlineOffset = '-5px';
-  elm.style.zIndex = '100000';
+let selected: HTMLElement | null = null;
 
-  function recover() {
+function recover(elm: HTMLElement) {
+  if (elm) {
     elm.style.outline = savedOutline;
     elm.style.outlineOffset = savedOffset;
     elm.style.zIndex = savedZIndex;
-    savedOutline = '';
-    savedOffset = '';
-    savedZIndex = '';
   }
-
-  async function handleClick(c: MouseEvent) {
-    c.preventDefault();
-    c.stopPropagation();
-    recover();
-    await tilStyleApplied(elm, {
-      outline: savedOutline,
-      outlineOffset: savedOffset,
-      zIndex: savedZIndex,
-    });
-    const clientRect = elm.getBoundingClientRect();
-    const rect = {
-      x: clientRect.x - MARGIN,
-      y: clientRect.y - MARGIN,
-      width: clientRect.width + MARGIN * 2,
-      height: clientRect.height + MARGIN * 2,
-    };
-    chrome.runtime.sendMessage(
-      {
-        type: 'capture.execute',
-        area: { x: rect.x, y: rect.y, w: rect.width, h: rect.height },
-        dpr: devicePixelRatio,
-      },
-      (res) => {
-        enabled = false;
-        elm.removeEventListener('click', handleClick);
-        document.removeEventListener('mouseover', handleMouseOver);
-        const reactRoot = document.getElementById('dc-root');
-        if (reactRoot != null) {
-          reactRoot.style.display = 'block';
-        }
-        ReactDOM.render(
-          <App imgURL={res.data} originalSize={rect} />,
-          reactRoot,
-        );
-      },
-    );
-  }
-
-  function remove() {
-    recover();
-    elm.removeEventListener('click', handleClick);
-    elm.removeEventListener('mouseout', remove);
-  }
-
-  elm.addEventListener('click', handleClick);
-  elm.addEventListener('mouseout', remove);
+  savedOutline = '';
+  savedOffset = '';
+  savedZIndex = '';
 }
 
-function enableExtension() {
-  document.addEventListener('mouseover', handleMouseOver);
+function handleMouseOut(e: MouseEvent) {
+  recover(e.target as HTMLElement);
 }
 
-function disableExtension() {
-  document.removeEventListener('mouseover', handleMouseOver);
+async function capture() {
+  if (selected == null) return;
+  disableExtension();
+  await tilStyleApplied(selected, {
+    outline: savedOutline,
+    outlineOffset: savedOffset,
+    zIndex: savedZIndex,
+  });
+  const clientRect = selected.getBoundingClientRect();
+  const rect = {
+    x: clientRect.x - MARGIN,
+    y: clientRect.y - MARGIN,
+    width: clientRect.width + MARGIN * 2,
+    height: clientRect.height + MARGIN * 2,
+  };
+  chrome.runtime.sendMessage(
+    {
+      type: 'capture.execute',
+      area: { x: rect.x, y: rect.y, w: rect.width, h: rect.height },
+      dpr: devicePixelRatio,
+    },
+    (res) => {
+      if (selected == null) return;
+      enabled = false;
+      selected.removeEventListener('click', capture);
+      document.removeEventListener('mouseover', handleMouseOver);
+      const reactRoot = document.getElementById('dc-root');
+      if (reactRoot != null) {
+        reactRoot.style.display = 'block';
+      }
+      ReactDOM.render(<App imgURL={res.data} originalSize={rect} />, reactRoot);
+    },
+  );
+}
+
+function handleMouseOver(e: MouseEvent) {
+  selected = e.target as HTMLElement;
+  savedOutline = selected.style.outline;
+  savedOffset = selected.style.outlineOffset;
+  savedZIndex = selected.style.zIndex;
+  selected.style.outline = '#619ec988 solid 5px';
+  selected.style.outlineOffset = '-5px';
+  selected.style.zIndex = '100000';
 }
 
 let enabled = false;
+
+function enableExtension() {
+  document.addEventListener('mouseover', handleMouseOver);
+  document.addEventListener('mouseout', handleMouseOut);
+  document.addEventListener('click', capture);
+  enabled = true;
+}
+
+function disableExtension() {
+  selected && recover(selected);
+  document.removeEventListener('mouseover', handleMouseOver);
+  document.removeEventListener('mouseout', handleMouseOut);
+  document.removeEventListener('click', capture);
+  enabled = false;
+}
 
 chrome.runtime.onMessage.addListener((msg, _, respond) => {
   switch (msg.type) {
@@ -123,8 +126,7 @@ chrome.runtime.onMessage.addListener((msg, _, respond) => {
       respond({ type: 'capture.get', data: { value: enabled } });
       break;
     case 'capture.toggle.request':
-      enabled = !enabled;
-      enabled ? enableExtension() : disableExtension();
+      enabled ? disableExtension() : enableExtension();
       respond();
       break;
     case 'api.component.add':
