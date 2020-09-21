@@ -28,6 +28,7 @@ const Button: React.FC<Props> = ({ children, onClick }) => {
 };
 
 const buttonStyle: CSSProperties = {
+  fontFamily: 'Arial,"Helvetica Neue",Helvetica,sans-serif;',
   height: 30,
   boxSizing: 'border-box',
   background: 'white',
@@ -38,6 +39,10 @@ const buttonStyle: CSSProperties = {
   verticalAlign: 'middle',
   cursor: 'pointer',
   transition: 'color 500ms',
+
+  // Protect from website's css.
+  lineHeight: 1,
+  textTransform: 'none',
 };
 
 export default Button;
