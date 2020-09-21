@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
 
+import '../styles/common.css';
 import '../styles/app.css';
-import { API_URL } from './globals';
+import IconButton from '../components/IconButton';
 
 type Props = {
   imgURL: string;
@@ -11,8 +12,10 @@ type Props = {
 };
 
 const App: React.FC<Props> = ({ imgURL, originalSize }) => {
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<boolean>(false);
+
   useEffect(() => {
-    console.log('api', API_URL);
     Modal.setAppElement('#dc-root');
   }, []);
 
@@ -21,48 +24,89 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
       const root = document.getElementById('dc-root');
       if (root == null) return;
       root.style.display = 'none';
-      document.body.classList.remove('locked');
     };
   }, []);
 
-  const handleClose = () => {
+  const close = () => {
     const root = document.getElementById('dc-root');
     if (root != null) {
       ReactDOM.unmountComponentAtNode(root);
     }
   };
 
-  const handleSaveClick = async () => {
-    chrome.runtime.sendMessage({
-      type: 'api.component.add',
-      dataURL: imgURL,
-      domain: window.location.hostname,
-    });
+  const handleUploadClick = async () => {
+    setSending(true);
+    chrome.runtime.sendMessage(
+      {
+        type: 'api.component.add',
+        dataURL: imgURL,
+        domain: window.location.hostname,
+      },
+      (resp) => {
+        setSending(false);
+        if (resp.data.value === true) {
+          close();
+        } else {
+          setError(true);
+        }
+      },
+    );
   };
 
   return (
-    <Modal
-      style={{
-        overlay: { backgroundColor: '#0008', zIndex: 99999999 },
-      }}
-      isOpen={true}
-      onRequestClose={handleClose}
-      shouldCloseOnOverlayClick={true}
-    >
-      <div>
-        <img
-          src={imgURL}
-          style={{
-            width: originalSize.width,
-            height: originalSize.height,
-          }}
-        />
-      </div>
-      <div>
-        <button onClick={handleSaveClick}>Save</button>
-      </div>
-    </Modal>
+    <>
+      <Modal
+        style={{
+          overlay: { backgroundColor: '#0008', zIndex: 99999999 },
+        }}
+        isOpen={true}
+        onRequestClose={close}
+        shouldCloseOnOverlayClick={true}
+      >
+        <div style={containerStyle}>
+          <div>
+            <img
+              src={imgURL}
+              style={{
+                ...imgStyle,
+                width: originalSize.width,
+                height: originalSize.height,
+              }}
+            />
+          </div>
+          <div>
+            <IconButton
+              loading={sending}
+              src={chrome.runtime.getURL('/img/upload.png')}
+              onClick={handleUploadClick}
+            >
+              Upload
+            </IconButton>
+          </div>
+          <div style={errorStyle}>
+            {true ? 'Sorry, something went wrong.' : null}
+          </div>
+        </div>
+      </Modal>
+    </>
   );
+};
+
+const containerStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+};
+
+const imgStyle: CSSProperties = {
+  maxWidth: '100%',
+  maxHeight: '100%',
+  marginBottom: 50,
+};
+
+const errorStyle: CSSProperties = {
+  marginTop: 25,
+  color: '#e85367',
 };
 
 export default App;

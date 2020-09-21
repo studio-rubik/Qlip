@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
+import '../styles/common.css';
 import '../styles/popup.css';
-import GoogleIcon from './GoogleIcon';
+import SignInButton from '../components/SignInButton';
+import IconButton from '../components/IconButton';
 
 let isMac = false;
 if (navigator.appVersion.indexOf('Mac') != -1) {
@@ -12,6 +14,7 @@ if (navigator.appVersion.indexOf('Mac') != -1) {
 const App: React.FC = () => {
   const [idToken, setIdToken] = useState('');
   const [enabled, setEnabled] = useState(false);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener((msg) => {
@@ -31,8 +34,10 @@ const App: React.FC = () => {
   }, []);
 
   const signIn = () => {
+    setSending(true);
     chrome.runtime.sendMessage({ type: 'signIn' }, (resp) => {
       setIdToken(resp.data.idToken);
+      setSending(false);
     });
   };
 
@@ -45,19 +50,13 @@ const App: React.FC = () => {
   return (
     <div className="container">
       {idToken === '' ? (
-        <button className="sign-in" onClick={signIn}>
-          <span className="icon">
-            <GoogleIcon />
-          </span>
-          Sign in with Google
-        </button>
+        <SignInButton loading={sending} onClick={signIn} />
       ) : null}
       {idToken !== '' ? (
         <div>
-          <button onClick={toggleCapture}>
-            <img src="/img/area.png" className="icon" />
-            {enabled ? 'Stop' : 'Capture'}
-          </button>
+          <IconButton src="/img/area.png" onClick={toggleCapture}>
+            Capture
+          </IconButton>
           <span className="keybinding">{keybinding}</span>
         </div>
       ) : null}

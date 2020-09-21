@@ -1,4 +1,3 @@
-import { API_URL } from './globals';
 import './hot-reload';
 
 import * as utils from './utils';
@@ -122,16 +121,18 @@ function handleCaptureMsg(
     );
   });
 }
-
-async function componentAdd(msg: ComponentAddMsg) {
+async function componentAdd(msg: ComponentAddMsg, respond: any) {
   const fd = new FormData();
   fd.append('domain', msg.domain);
   fd.append('name', 'component_name');
   fd.append('file', await utils.dataUrlToFile(msg.dataURL, 'file'));
+  const headers = { Authorization: 'Bearer ' + idToken };
   const resp = await fetch(`${API_URL}/components`, {
     method: 'post',
+    headers,
     body: fd,
   });
+  respond({ data: { value: resp.ok } });
 }
 
 function toggleCapture() {
@@ -165,7 +166,7 @@ chrome.runtime.onMessage.addListener((msg, _, respond) => {
       handleCaptureMsg(msg, respond);
       break;
     case 'api.component.add':
-      componentAdd(msg);
+      componentAdd(msg, respond);
       break;
     default:
       break;

@@ -59,13 +59,12 @@ def files():
 @app.route("/components", methods=["POST"])
 @require_auth
 def components_post():
-    user_id = request.headers.get("DomClipper-User-ID")
     file = request.files.get("file")
     site, created = models.Website.get_or_create(
         domain=request.form.get("domain"), name=""
     )
     comp = models.Component.create(
-        user_id=user_id, name=request.form.get("name"), website=site
+        user_id=g.user.id, name=request.form.get("name"), website=site
     )
     comp_file = models.ComponentFile.create(key=comp.id, component=comp)
     comp_file.store_file(file)

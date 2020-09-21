@@ -89,7 +89,6 @@ function handleMouseOver(e: MouseEvent) {
         if (reactRoot != null) {
           reactRoot.style.display = 'block';
         }
-        document.body.classList.add('locked');
         ReactDOM.render(
           <App imgURL={res.data} originalSize={rect} />,
           reactRoot,
