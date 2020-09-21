@@ -26,11 +26,8 @@ const App: React.FC = () => {
   };
 
   const toggleCapture = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0].id == null) return;
-      chrome.tabs.sendMessage(tabs[0].id, { type: 'capture.toggle' }, () => {
-        window.close();
-      });
+    chrome.runtime.sendMessage({ type: 'capture.toggle' }, () => {
+      window.close();
     });
   };
 

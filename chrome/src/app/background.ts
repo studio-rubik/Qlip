@@ -53,15 +53,44 @@ function startSignInFlow(resp: any) {
         idToken =
           redirectedTo?.split('#', 2)[1]?.split('&')[0]?.split('=')[1] ?? '';
         resp({ type: 'signIn', data: { idToken } });
-        console.log(idToken);
       }
     },
   );
 }
 
 function fetchIdToken(resp: any) {
-  console.log(idToken);
   resp({ type: 'idToken', data: { idToken } });
+}
+
+async function injectContentScript() {
+  return new Promise((resolve) => {
+    chrome.tabs.query({ active: true }, (tabs) => {
+      const tabId = tabs[0].id;
+      if (tabId == null) return;
+      chrome.tabs.executeScript(
+        tabId,
+        {
+          code: "document.getElementById('dc-root') == null",
+        },
+        (res) => {
+          if (res[0] === true) {
+            chrome.tabs.executeScript(
+              tabId,
+              {
+                file: '/js/content.js',
+                runAt: 'document_start',
+              },
+              () => {
+                resolve();
+              },
+            );
+          } else {
+            resolve();
+          }
+        },
+      );
+    });
+  });
 }
 
 type CaptureMsg = {
@@ -105,17 +134,31 @@ async function componentAdd(msg: ComponentAddMsg) {
   });
 }
 
-chrome.runtime.onMessage.addListener((msg, _, resp) => {
+function toggleCapture(respond?: () => void) {
+  if (idToken === '') return;
+  chrome.tabs.query({ active: true }, async (tab) => {
+    if (tab[0].id == null) return;
+    await injectContentScript();
+    chrome.tabs.sendMessage(tab[0].id, { type: 'capture.toggle' }, () => {
+      respond && respond();
+    });
+  });
+}
+
+chrome.runtime.onMessage.addListener((msg, _, respond) => {
   console.log(msg);
   switch (msg.type) {
     case 'signIn':
-      startSignInFlow(resp);
+      startSignInFlow(respond);
       break;
     case 'idToken':
-      fetchIdToken(resp);
+      fetchIdToken(respond);
       break;
-    case 'capture':
-      handleCaptureMsg(msg, resp);
+    case 'capture.toggle':
+      toggleCapture(respond);
+      break;
+    case 'capture.execute':
+      handleCaptureMsg(msg, respond);
       break;
     case 'api.component.add':
       componentAdd(msg);
@@ -128,11 +171,7 @@ chrome.runtime.onMessage.addListener((msg, _, resp) => {
 
 chrome.commands.onCommand.addListener((command) => {
   if (command === 'capture.toggle') {
-    if (idToken === '') return;
-    chrome.tabs.query({ active: true }, (tab) => {
-      if (tab[0].id == null) return;
-      chrome.tabs.sendMessage(tab[0].id, { type: 'capture.toggle' });
-    });
+    toggleCapture();
   }
 });
 

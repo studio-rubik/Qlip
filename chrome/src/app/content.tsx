@@ -14,8 +14,6 @@ function init() {
   document.body.appendChild(reactRoot);
 }
 
-window.addEventListener('load', init, false);
-
 type OutlineStyles = {
   outline: string;
   outlineOffset: string;
@@ -79,7 +77,7 @@ function handleMouseOver(e: MouseEvent) {
     };
     chrome.runtime.sendMessage(
       {
-        type: 'capture',
+        type: 'capture.execute',
         area: { x: rect.x, y: rect.y, w: rect.width, h: rect.height },
         dpr: devicePixelRatio,
       },
@@ -136,3 +134,5 @@ chrome.runtime.onMessage.addListener((msg, _, resp) => {
       break;
   }
 });
+
+init();

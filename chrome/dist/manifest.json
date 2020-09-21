@@ -26,12 +26,6 @@
     "identity.email"
   ],
   "content_security_policy": "default-src 'self'; style-src 'self' data: 'unsafe-inline'; img-src data:; connect-src data: http: https:;",
-  "content_scripts": [
-    {
-      "matches": ["https://*/*"],
-      "js": ["js/content.js"]
-    }
-  ],
   "oauth2": {
     "client_id": "45191155617-ejkqtnouj8keikp8cia1mk84virh3acr.apps.googleusercontent.com",
     "scopes": ["openid", "email", "profile"]
