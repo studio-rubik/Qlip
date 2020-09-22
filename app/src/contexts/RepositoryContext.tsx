@@ -5,8 +5,12 @@ import * as errors from '../common/errors';
 import Repository from '../interface/repository';
 import { useStore } from '../store';
 
+if (process.env.REACT_APP_BACKEND_URL == null) {
+  throw new Error('REACT_APP_BACKEND_URL is not set');
+}
+
 const serverRepository = new ServerRepository(
-  process.env.REACT_APP_BACKEND_URL!,
+  process.env.REACT_APP_BACKEND_URL,
 );
 serverRepository.client.afterResponse((resp) => {
   if (!resp.ok) {

@@ -16,7 +16,6 @@ import {
   ClockCircleOutlined,
 } from '@ant-design/icons';
 
-import color from '../common/color';
 import { fromUTC } from '../common/utils';
 import useRepository from '../hooks/useRepository';
 import { useStore } from '../store/';

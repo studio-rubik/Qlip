@@ -1,7 +1,6 @@
 import create from 'zustand';
 import produce from 'immer';
 
-import * as domain from '../common/domain';
 import { APIResponseEntity } from '../interface/repository';
 
 export type State = {

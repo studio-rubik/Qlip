@@ -1,5 +1,3 @@
-import * as domain from '../common/domain';
-
 export type APIResponse<T> = {
   data: T;
   hasMore: boolean;

@@ -132,7 +132,6 @@ const Main = () => {
   const repo = useRepository();
   const set = useStore((store) => store.set);
 
-  const [deleting, setDeleting] = useState(false);
   const confirmDeleteFactory = (compID: string) => {
     return () =>
       confirm({
@@ -141,7 +140,6 @@ const Main = () => {
         content: "Associated components won't be deleted.",
         onOk: async () => {
           try {
-            setDeleting(true);
             await repo.componentDelete(compID);
             set((store) => {
               delete store.components.byId[compID];
@@ -153,8 +151,6 @@ const Main = () => {
           } catch (e) {
             console.log(e);
             notification.error({ message: 'Sorry, something went wrong' });
-          } finally {
-            setDeleting(false);
           }
         },
       });
