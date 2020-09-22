@@ -19,7 +19,13 @@ function publish(msg: any) {
 
 let idToken = '';
 
-function startSignInFlow(resp: any) {
+type SignInResponse = {
+  data: {
+    idToken: string;
+  };
+};
+
+function startSignInFlow(respond?: (resp: SignInResponse) => void) {
   const manifest = chrome.runtime.getManifest();
   if (manifest.oauth2 == null || manifest.oauth2.scopes == null) {
     throw 'Invalid manifest.json';
@@ -51,7 +57,7 @@ function startSignInFlow(resp: any) {
       } else {
         idToken =
           redirectedTo?.split('#', 2)[1]?.split('&')[0]?.split('=')[1] ?? '';
-        resp({ type: 'signIn', data: { idToken } });
+        respond && respond({ data: { idToken } });
       }
     },
   );
@@ -126,13 +132,28 @@ async function componentAdd(msg: ComponentAddMsg, respond: any) {
   fd.append('domain', msg.domain);
   fd.append('name', 'component_name');
   fd.append('file', await utils.dataUrlToFile(msg.dataURL, 'file'));
-  const headers = { Authorization: 'Bearer ' + idToken };
-  const resp = await fetch(`${API_URL}/components`, {
-    method: 'post',
-    headers,
-    body: fd,
-  });
-  respond({ data: { value: resp.ok } });
+
+  // No need to receive token as argument since this closure can reference
+  // `idToken` global variable. But I just want to clarify it can be modified after retry.
+  const request = (token: string) => {
+    return fetch(`${API_URL}/components`, {
+      method: 'post',
+      headers: { Authorization: 'Bearer ' + token },
+      body: fd,
+    });
+  };
+
+  const resp = await request(idToken);
+
+  // Retry if idToken has expired.
+  if (resp.status === 401) {
+    startSignInFlow(async (response) => {
+      const retryResp = await request(response.data.idToken);
+      respond({ data: { value: retryResp.ok } });
+    });
+  } else {
+    respond({ data: { value: resp.ok } });
+  }
 }
 
 function toggleCapture() {
