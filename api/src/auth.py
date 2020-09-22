@@ -62,6 +62,6 @@ def require_auth(f):
             g.user = User(id=userid)
             return f(*args, **kwargs)
         except ValueError:
-            raise AuthError
+            raise AuthError(error="Invalid token", status_code=401)
 
     return decorated
