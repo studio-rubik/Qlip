@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import current_app as app, request, g
+from flask import request, g
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
@@ -60,8 +60,9 @@ def require_auth(f):
             idinfo = id_token.verify_oauth2_token(token, requests.Request())
             userid = idinfo["sub"]
             g.user = User(id=userid)
-            return f(*args, **kwargs)
         except ValueError:
             raise AuthError(error="Invalid token", status_code=401)
+
+        return f(*args, **kwargs)
 
     return decorated
