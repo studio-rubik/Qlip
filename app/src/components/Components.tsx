@@ -280,6 +280,7 @@ const Main = () => {
                 component={selectedItems.component}
                 file={selectedItems.file}
                 website={selectedItems.website}
+                onSubmitSuccess={closeModal}
               />
             ) : null}
           </Modal>
