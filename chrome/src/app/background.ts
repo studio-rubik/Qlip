@@ -157,8 +157,10 @@ async function componentAdd(msg: ComponentAddMsg, respond: any) {
   }
 }
 
-function toggleCapture() {
-  if (idToken === '') return;
+async function toggleCapture() {
+  if (idToken === '') {
+    await startSignInFlow();
+  }
   chrome.tabs.query({ active: true }, async (tab) => {
     if (tab[0].id == null) return;
     await injectContentScript();
