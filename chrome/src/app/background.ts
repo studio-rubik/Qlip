@@ -174,12 +174,13 @@ async function toggleCapture() {
   });
 }
 
-chrome.runtime.onMessage.addListener(async (msg, _, respond) => {
+chrome.runtime.onMessage.addListener((msg, _, respond) => {
   console.log(msg);
   switch (msg.type) {
     case 'signIn':
-      const resp = await startSignInFlow();
-      respond(resp);
+      startSignInFlow().then((resp) => {
+        respond(resp);
+      });
       break;
     case 'idToken':
       fetchIdToken(respond);
