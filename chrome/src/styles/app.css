@@ -21,6 +21,16 @@
     align-items: center;
 }
 
+#dc-keybindings ul {
+    padding: 0;
+}
+
+#dc-keybindings li {
+    margin: 0;
+    padding: 4px;
+    line-height: 26px;
+}
+
 .dc-key-action {
     display: flex;
     justify-content: space-between;
@@ -28,14 +38,4 @@
 
 .dc-key {
     margin-left: 20px;
-}
-
-ul {
-    padding: 0;
-}
-
-li {
-    margin: 0;
-    padding: 4px;
-    line-height: 26px;
 }
