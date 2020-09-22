@@ -19,7 +19,7 @@ export default class ServerRepository implements Repository {
   componentsFilter(queries: ComponentsFilterQueries) {
     return this.client.get({
       path: 'components',
-      queries: queries as { [k: string]: string },
+      queries: queries as { [k: string]: string | number },
     });
   }
 

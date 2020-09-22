@@ -23,6 +23,7 @@ import {
   FileTextOutlined,
 } from '@ant-design/icons';
 import Modal from 'react-modal';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 import color from '../common/color';
 import useRepository, { useFetchComponents } from '../hooks/useRepository';
@@ -33,6 +34,8 @@ import ComponentDetail from './ComponentDetail';
 import AuthButton from './AuthButton';
 
 const { confirm } = AntModal;
+
+const limit = 10;
 
 const Main = () => {
   const token = useStore((store) => store.idToken);
@@ -63,11 +66,31 @@ const Main = () => {
   }, [components, files, selectedComponentID, websites]);
 
   const fetchComponents = useFetchComponents();
+  const [loading, setLoading] = useState(true);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [fetchedMore, setFetchedMore] = useState(false);
 
   useEffect(() => {
-    if (token) {
-      fetchComponents();
+    async function fn() {
+      if (token) {
+        // Re-initialize after url changed.
+        setLoading(true);
+        setHasMore(true);
+        setFetchedMore(false);
+
+        try {
+          const hasMore = await fetchComponents({ limit, offset: 0 });
+          setOffset(limit);
+          setHasMore(hasMore);
+        } catch (e) {
+          console.debug(e);
+        } finally {
+          setLoading(false);
+        }
+      }
     }
+    fn();
   }, [fetchComponents, token]);
 
   const handleCardClick = (componentID: string) => {
@@ -165,6 +188,20 @@ const Main = () => {
 
   const loaded = true;
 
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const hasMore = await fetchComponents({ limit, offset }, false);
+      setOffset((prev) => prev + limit);
+      setHasMore(hasMore);
+    } catch (e) {
+      console.debug(e);
+    } finally {
+      setFetchedMore(true);
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <PageHeader
@@ -175,52 +212,66 @@ const Main = () => {
       {loaded ? (
         <>
           <CardsContainer>
-            {components.length > 0 ? (
-              <Row gutter={[16, 16]}>
-                {components.map((comp) => (
-                  <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
-                    <Card
-                      hoverable
-                      cover={
-                        <CardImg
-                          src={files.find((f) => f.component === comp.id)?.url}
-                          alt=""
+            <InfiniteScroll
+              dataLength={components.length}
+              next={fetchData}
+              hasMore={hasMore}
+              loader={
+                <FlexCenter>
+                  <Spin />
+                </FlexCenter>
+              }
+              endMessage={fetchedMore ? <EndMsg>EOF</EndMsg> : null}
+            >
+              {components.length > 0 ? (
+                <Row gutter={[16, 16]}>
+                  {components.map((comp) => (
+                    <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
+                      <Card
+                        hoverable
+                        cover={
+                          <CardImg
+                            src={
+                              files.find((f) => f.component === comp.id)?.url
+                            }
+                            alt=""
+                          />
+                        }
+                        onClick={() => handleCardClick(comp.id)}
+                        bodyStyle={{ padding: 12 }}
+                      >
+                        <Card.Meta
+                          title={
+                            websites.find((s) => s.id === comp.website)?.domain
+                          }
+                          description={
+                            <div style={{ padding: '6px 0' }}>
+                              {tags
+                                .filter((t) => comp.tagIds.includes(t.id))
+                                .map((t) => (
+                                  <Tag key={t.id}>{t.name}</Tag>
+                                ))}
+                            </div>
+                          }
                         />
-                      }
-                      onClick={() => handleCardClick(comp.id)}
-                      bodyStyle={{ padding: 12 }}
-                    >
-                      <Card.Meta
-                        title={
-                          websites.find((s) => s.id === comp.website)?.domain
-                        }
-                        description={
-                          <div style={{ padding: '6px 0' }}>
-                            {tags
-                              .filter((t) => comp.tagIds.includes(t.id))
-                              .map((t) => (
-                                <Tag key={t.id}>{t.name}</Tag>
-                              ))}
-                          </div>
-                        }
-                      />
-                      <MoreButtonRow onClick={stopPropagation}>
-                        <Dropdown
-                          overlay={moreActionFactory(comp.id)}
-                          trigger={['click']}
-                        >
-                          <MoreButton>
-                            <EllipsisOutlined style={{ fontSize: 22 }} />
-                          </MoreButton>
-                        </Dropdown>
-                      </MoreButtonRow>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            ) : (
-              <Empty description="No Component Found" />
-            )}
+                        <MoreButtonRow onClick={stopPropagation}>
+                          <Dropdown
+                            overlay={moreActionFactory(comp.id)}
+                            trigger={['click']}
+                          >
+                            <MoreButton>
+                              <EllipsisOutlined style={{ fontSize: 22 }} />
+                            </MoreButton>
+                          </Dropdown>
+                        </MoreButtonRow>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              ) : loading ? null : (
+                <Empty description="No Component Found" />
+              )}
+            </InfiniteScroll>
           </CardsContainer>
           <Modal
             isOpen={modalOpen}
@@ -266,6 +317,17 @@ const MoreButton = styled.div`
   :hover {
     background: #0002;
   }
+`;
+
+const FlexCenter = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const EndMsg = styled.p`
+  margin-top: 50px;
+  text-align: center;
+  color: #999;
 `;
 
 export default Main;

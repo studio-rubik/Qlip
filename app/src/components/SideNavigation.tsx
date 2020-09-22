@@ -64,7 +64,7 @@ function SideNavigation() {
           try {
             await repo.tagDelete(tagID);
             message.success('Tag successfully deleted.');
-            fetchComponents();
+            fetchComponents({ limit: 10, offset: 0 });
             fetchTags();
           } catch (e) {
             console.log(e);

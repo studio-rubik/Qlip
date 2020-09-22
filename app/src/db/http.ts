@@ -46,7 +46,18 @@ function constructPath(path: Path): string {
     path.path = path.path.replace(match[1], param);
   });
   const url = new URL(path.path);
-  url.search = new URLSearchParams(path.queries as any).toString();
+  // Remove key whose value is null | undefined
+  const qs = Object.entries(path.queries ?? {}).reduce(
+    (prev, [currK, currV]) => {
+      if (currV == null) return prev;
+      return {
+        ...prev,
+        [currK]: currV,
+      };
+    },
+    {},
+  );
+  url.search = new URLSearchParams(qs as any).toString();
   return url.toString();
 }
 

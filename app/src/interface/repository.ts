@@ -1,9 +1,5 @@
 import * as domain from '../common/domain';
 
-export type RepositoryFilter = {
-  [column: string]: string | number | string[] | number[];
-};
-
 export type APIResponse<T> = {
   data: T;
   hasMore: boolean;
@@ -14,10 +10,15 @@ export type APIResponseEntity<T> = {
   allIds: string[];
 };
 
+export type Paginatable = {
+  limit?: number;
+  offset?: number;
+};
+
 export type ComponentsFilterQueries = {
   tag?: string | null;
   website?: string | null;
-};
+} & Paginatable;
 
 type ComponentsFilterResp = APIResponse<{
   components: APIResponseEntity<any>;
