@@ -6,7 +6,7 @@ import {
   CloseCircleOutlined,
   TagsOutlined,
   GlobalOutlined,
-  MoreOutlined,
+  EllipsisOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
@@ -116,7 +116,10 @@ function SideNavigation() {
                 }}
               >
                 <MenuItemContent>
-                  <Link to={`/?tag=${t.id}`}>
+                  <Link
+                    to={`/?tag=${t.id}`}
+                    style={{ position: 'relative', width: '100%' }}
+                  >
                     <MenuItemText>{t.name}</MenuItemText>
                   </Link>
                   <Dropdown
@@ -124,9 +127,9 @@ function SideNavigation() {
                     trigger={['click']}
                   >
                     <MoreButton>
-                      <MoreOutlined
+                      <EllipsisOutlined
                         style={{
-                          fontSize: 24,
+                          fontSize: 22,
                           margin: 0,
                         }}
                       />
@@ -165,10 +168,13 @@ const Logo = styled.div`
 const MenuItemContent = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `;
 
-const MenuItemText = styled.span`
+const MenuItemText = styled.div`
+  position: relative;
   color: rgba(255, 255, 255, 0.65);
+  width: 100%;
 
   ${MenuItemContent}:hover & {
     color: white;
@@ -178,18 +184,20 @@ const MenuItemText = styled.span`
 const MoreButton = styled.div`
   display: flex;
   visibility: hidden;
-  transform: rotate(90deg);
-  border-radius: 4px;
-  width: 24px;
   justify-content: center;
   align-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  padding: 2px;
+  z-index: 100000;
 
   ${MenuItemContent}:hover & {
     visibility: visible;
   }
 
   &:hover {
-    background: #40589c;
+    background: #3d3d3d;
   }
 `;
 
