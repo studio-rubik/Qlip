@@ -98,7 +98,7 @@ function SideNavigation() {
         <Menu
           theme="dark"
           mode="inline"
-          defaultOpenKeys={['tag', 'website']}
+          defaultOpenKeys={['tag']}
           selectedKeys={selectedMenuItem ? [selectedMenuItem] : undefined}
           onSelect={handleSelect}
           style={{ height: `calc(100% - ${LOGO_HEIGHT}px)`, borderRight: 0 }}
