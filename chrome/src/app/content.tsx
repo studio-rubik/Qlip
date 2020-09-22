@@ -85,36 +85,65 @@ async function capture() {
   );
 }
 
-function recover(elm: HTMLElement) {
-  if (elm) {
-    elm.style.outline = savedOutline;
-    elm.style.outlineOffset = savedOffset;
-    elm.style.zIndex = savedZIndex;
-  }
-  savedOutline = '';
-  savedOffset = '';
-  savedZIndex = '';
-}
-
-function handleMouseOver(e: MouseEvent) {
-  selected = e.target as HTMLElement;
+function select(elm: HTMLElement | null = null) {
+  deselect(selected);
+  if (elm == null) return;
+  selected = elm;
   savedOutline = selected.style.outline;
   savedOffset = selected.style.outlineOffset;
   savedZIndex = selected.style.zIndex;
-  const color = e.target === instruction ? '#db373788' : '#619ec988';
+  const color = selected === instruction ? '#db373788' : '#619ec988';
   selected.style.outline = `${color} solid 5px`;
   selected.style.outlineOffset = '-5px';
   selected.style.zIndex = '100000';
 }
 
+function deselect(elm: HTMLElement | null = null) {
+  if (elm == null) return;
+  elm.style.outline = savedOutline;
+  elm.style.outlineOffset = savedOffset;
+  elm.style.zIndex = savedZIndex;
+  savedOutline = '';
+  savedOffset = '';
+  savedZIndex = '';
+}
+
+function selectParent() {
+  if (selected == null) return;
+  const parent = selected.parentNode;
+  if (parent) {
+    deselect(selected);
+    select(parent as HTMLElement);
+  }
+}
+
+function selectChild() {
+  if (selected == null) return;
+  const child = selected.children[0];
+  if (child) {
+    deselect(selected);
+    select(child as HTMLElement);
+  }
+}
+
+function handleMouseOver(e: MouseEvent) {
+  select(e.target as HTMLElement);
+}
+
 function handleMouseOut(e: MouseEvent) {
-  recover(e.target as HTMLElement);
+  deselect(e.target as HTMLElement);
 }
 
 function handleKeyDown(e: KeyboardEvent) {
   switch (e.key) {
     case 's':
       capture();
+      break;
+    case 'q':
+      selectParent();
+      break;
+    case 'w':
+      selectChild();
       break;
     case 'Escape':
       disableExtension();
@@ -135,7 +164,7 @@ function enableExtension() {
 }
 
 function disableExtension() {
-  selected && recover(selected);
+  selected && deselect(selected);
   if (instruction) {
     instruction.style.display = 'none';
   }
