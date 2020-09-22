@@ -25,42 +25,44 @@ type SignInResponse = {
   };
 };
 
-function startSignInFlow(respond?: (resp: SignInResponse) => void) {
-  const manifest = chrome.runtime.getManifest();
-  if (manifest.oauth2 == null || manifest.oauth2.scopes == null) {
-    throw 'Invalid manifest.json';
-  }
-  const clientId = encodeURIComponent(manifest.oauth2.client_id);
-  const scopes = encodeURIComponent(manifest.oauth2.scopes.join(' '));
-  const redirectUri = encodeURIComponent(
-    'https://' + chrome.runtime.id + '.chromiumapp.org',
-  );
-  const url =
-    'https://accounts.google.com/o/oauth2/auth' +
-    '?client_id=' +
-    clientId +
-    '&response_type=id_token' +
-    '&access_type=offline' +
-    '&redirect_uri=' +
-    redirectUri +
-    '&scope=' +
-    scopes;
+async function startSignInFlow(): Promise<SignInResponse> {
+  return new Promise((resolve, reject) => {
+    const manifest = chrome.runtime.getManifest();
+    if (manifest.oauth2 == null || manifest.oauth2.scopes == null) {
+      throw 'Invalid manifest.json';
+    }
+    const clientId = encodeURIComponent(manifest.oauth2.client_id);
+    const scopes = encodeURIComponent(manifest.oauth2.scopes.join(' '));
+    const redirectUri = encodeURIComponent(
+      'https://' + chrome.runtime.id + '.chromiumapp.org',
+    );
+    const url =
+      'https://accounts.google.com/o/oauth2/auth' +
+      '?client_id=' +
+      clientId +
+      '&response_type=id_token' +
+      '&access_type=offline' +
+      '&redirect_uri=' +
+      redirectUri +
+      '&scope=' +
+      scopes;
 
-  chrome.identity.launchWebAuthFlow(
-    {
-      url: url,
-      interactive: true,
-    },
-    function (redirectedTo) {
-      if (chrome.runtime.lastError) {
-        console.log(chrome.runtime.lastError.message);
-      } else {
-        idToken =
-          redirectedTo?.split('#', 2)[1]?.split('&')[0]?.split('=')[1] ?? '';
-        respond && respond({ data: { idToken } });
-      }
-    },
-  );
+    chrome.identity.launchWebAuthFlow(
+      {
+        url: url,
+        interactive: true,
+      },
+      function (redirectedTo) {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError.message);
+        } else {
+          idToken =
+            redirectedTo?.split('#', 2)[1]?.split('&')[0]?.split('=')[1] ?? '';
+          resolve({ data: { idToken } });
+        }
+      },
+    );
+  });
 }
 
 function fetchIdToken(resp: any) {
@@ -147,10 +149,9 @@ async function componentAdd(msg: ComponentAddMsg, respond: any) {
 
   // Retry if idToken has expired.
   if (resp.status === 401) {
-    startSignInFlow(async (response) => {
-      const retryResp = await request(response.data.idToken);
-      respond({ data: { value: retryResp.ok } });
-    });
+    const tokenResp = await startSignInFlow();
+    const retryResp = await request(tokenResp.data.idToken);
+    respond({ data: { value: retryResp.ok } });
   } else {
     respond({ data: { value: resp.ok } });
   }
@@ -171,11 +172,12 @@ function toggleCapture() {
   });
 }
 
-chrome.runtime.onMessage.addListener((msg, _, respond) => {
+chrome.runtime.onMessage.addListener(async (msg, _, respond) => {
   console.log(msg);
   switch (msg.type) {
     case 'signIn':
-      startSignInFlow(respond);
+      const resp = await startSignInFlow();
+      respond(resp);
       break;
     case 'idToken':
       fetchIdToken(respond);
