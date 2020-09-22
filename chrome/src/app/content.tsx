@@ -7,23 +7,72 @@ const MARGIN = 20;
 
 let selected: HTMLElement | null = null;
 let reactRoot: HTMLDivElement | null = null;
-let instruction: HTMLDivElement | null = null;
+let keybindings: HTMLDivElement | null = null;
+let clickToHide: HTMLDivElement | null = null;
+let keybindingsContent: HTMLUListElement | null = null;
 let savedOutline = '';
 let savedOffset = '';
 let savedZIndex = '';
 
-function init() {
-  reactRoot = document.createElement('div');
-  reactRoot.style.display = 'none';
-  reactRoot.setAttribute('id', 'dc-root');
-  instruction = document.createElement('div');
-  instruction.innerText = 'Press S to capture';
-  instruction.addEventListener('click', () => {
-    instruction!.style.display = 'none';
+function createReactRoot() {
+  const root = document.createElement('div');
+  root.style.display = 'none';
+  root.setAttribute('id', 'dc-root');
+  return root;
+}
+
+const keyActions = [
+  { key: '[s]', action: 'Capture' },
+  { key: '[q]', action: 'Parent' },
+  { key: '[w]', action: 'Child' },
+];
+
+function createKeybindingsContent() {
+  keybindingsContent = document.createElement('ul');
+  clickToHide = document.createElement('div');
+  clickToHide.innerText = 'Click to hide';
+  keyActions.forEach((item) => {
+    const li = document.createElement('li');
+    li.classList.add('dc-key-action');
+    const key = document.createElement('div');
+    const action = document.createElement('div');
+    key.classList.add('dc-key');
+    action.classList.add('dc-action');
+    key.innerText = item.key;
+    action.innerText = item.action;
+    keybindingsContent!.appendChild(li);
+    li.appendChild(action);
+    li.appendChild(key);
   });
-  instruction.setAttribute('id', 'dc-instruction');
+}
+
+function createKeybindings() {
+  const keybindings = document.createElement('div');
+  createKeybindingsContent();
+  keybindings.setAttribute('id', 'dc-keybindings');
+  keybindings.addEventListener('mouseover', (e: MouseEvent) => {
+    e.stopPropagation();
+    if (keybindingsContent && clickToHide) {
+      keybindings.replaceChild(clickToHide, keybindingsContent);
+    }
+  });
+  keybindings.addEventListener('mouseout', () => {
+    if (keybindingsContent && clickToHide) {
+      keybindings.replaceChild(keybindingsContent, clickToHide);
+    }
+  });
+  keybindings.addEventListener('click', () => {
+    keybindings.style.display = 'none';
+  });
+  keybindings.appendChild(keybindingsContent!);
+  return keybindings;
+}
+
+function init() {
+  reactRoot = createReactRoot();
+  keybindings = createKeybindings();
   document.body.appendChild(reactRoot);
-  document.body.appendChild(instruction);
+  document.body.appendChild(keybindings);
 }
 
 type OutlineStyles = {
@@ -92,8 +141,7 @@ function select(elm: HTMLElement | null = null) {
   savedOutline = selected.style.outline;
   savedOffset = selected.style.outlineOffset;
   savedZIndex = selected.style.zIndex;
-  const color = selected === instruction ? '#db373788' : '#619ec988';
-  selected.style.outline = `${color} solid 5px`;
+  selected.style.outline = `#619ec988 solid 5px`;
   selected.style.outlineOffset = '-5px';
   selected.style.zIndex = '100000';
 }
@@ -154,8 +202,8 @@ function handleKeyDown(e: KeyboardEvent) {
 let enabled = false;
 
 function enableExtension() {
-  if (instruction) {
-    instruction.style.display = 'block';
+  if (keybindings) {
+    keybindings.style.display = 'flex';
   }
   document.addEventListener('mouseover', handleMouseOver);
   document.addEventListener('mouseout', handleMouseOut);
@@ -165,8 +213,8 @@ function enableExtension() {
 
 function disableExtension() {
   selected && deselect(selected);
-  if (instruction) {
-    instruction.style.display = 'none';
+  if (keybindings) {
+    keybindings.style.display = 'none';
   }
   document.removeEventListener('mouseover', handleMouseOver);
   document.removeEventListener('mouseout', handleMouseOut);
