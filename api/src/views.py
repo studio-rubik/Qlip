@@ -75,18 +75,28 @@ def components_post():
 @app.route("/components", methods=["GET"])
 @require_auth
 def components_get():
+    limit = int(request.args.get("limit") or 10)
+    offset = int(request.args.get("offset") or 0)
     tag = request.args.get("tag")
     site = request.args.get("website")
 
     components = (
         models.Component.select()
-        .where(models.Component.user_id == g.user.id)
+        .where((models.Component.user_id == g.user.id))
         .order_by(models.Component.created_at.desc())
     )
+
     if tag is not None:
-        components = [c for c in components if tag in c.tag_ids]
+        components = components.join(models.ComponentTag).where(
+            models.ComponentTag.tag.in_([tag])
+        )
     if site is not None:
-        components = [c for c in components if str(c.website.id) == site]
+        components = components.join(models.Website).where(models.Website.id == site)
+
+    total = components.count()
+    has_more = total >= offset + limit + 1
+
+    components = components.limit(limit).offset(offset)
 
     files = [comp.file.first() for comp in components]
 
@@ -95,6 +105,7 @@ def components_get():
             "components": Entity([comp.to_dict() for comp in components]).to_dict(),
             "component_files": Entity([f.to_dict() for f in files]).to_dict(),
         },
+        has_more=has_more,
         status=200,
     )
 
