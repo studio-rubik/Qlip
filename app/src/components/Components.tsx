@@ -35,6 +35,7 @@ import AuthButton from './AuthButton';
 const { confirm } = AntModal;
 
 const Main = () => {
+  const token = useStore((store) => store.idToken);
   const components = useStore((store) =>
     store.components.allIds.map((id) => store.components.byId[id]),
   );
@@ -64,8 +65,10 @@ const Main = () => {
   const fetchComponents = useFetchComponents();
 
   useEffect(() => {
-    fetchComponents();
-  }, [fetchComponents]);
+    if (token) {
+      fetchComponents();
+    }
+  }, [fetchComponents, token]);
 
   const handleCardClick = (componentID: string) => {
     setSelectedComponentID(componentID);

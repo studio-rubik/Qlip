@@ -15,7 +15,6 @@ const { Content } = Layout;
 function App() {
   useAuth();
   const authLoaded = useStore((store) => store.authLoaded);
-  const token = useStore((store) => store.idToken);
 
   return (
     <>

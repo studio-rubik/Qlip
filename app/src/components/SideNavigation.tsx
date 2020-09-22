@@ -23,6 +23,7 @@ const LOGO_HEIGHT = 50;
 
 function SideNavigation() {
   const repo = useRepository();
+  const token = useStore((store) => store.idToken);
   const tags = useStore((store) =>
     store.tags.allIds.map((id) => store.tags.byId[id]),
   );
@@ -47,9 +48,11 @@ function SideNavigation() {
   };
 
   useEffect(() => {
-    fetchTags();
-    fetchWebsites();
-  }, [fetchTags, fetchWebsites, repo, set]);
+    if (token) {
+      fetchTags();
+      fetchWebsites();
+    }
+  }, [fetchTags, fetchWebsites, repo, set, token]);
 
   const confirmDeleteFactory = (tagID: string) => {
     return () =>
