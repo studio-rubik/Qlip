@@ -66,7 +66,6 @@ const ComponentDetail: React.FC<Props> = ({
   };
 
   const handleNewTagChange = (e: any) => {
-    console.log(e.target.value);
     setNewTagValue(e.target.value);
   };
 
