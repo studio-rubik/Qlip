@@ -137,7 +137,6 @@ const Main = () => {
       confirm({
         title: 'Delete Component?',
         icon: <ExclamationCircleOutlined />,
-        content: "Associated components won't be deleted.",
         onOk: async () => {
           try {
             await repo.componentDelete(compID);
@@ -165,7 +164,6 @@ const Main = () => {
       >
         <span style={{ padding: '0 8px' }}>Detail</span>
       </Menu.Item>
-      <Menu.Divider />
       <Menu.Item
         danger
         key="delete"
