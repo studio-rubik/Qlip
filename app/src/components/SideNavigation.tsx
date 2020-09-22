@@ -75,8 +75,13 @@ function SideNavigation() {
 
   const moreActionFactory = (tagID: string) => (
     <Menu>
-      <Menu.Item key="delete" icon={<CloseCircleOutlined />} danger>
-        <span onClick={confirmDeleteFactory(tagID)}>Delete</span>
+      <Menu.Item
+        key="delete"
+        icon={<CloseCircleOutlined />}
+        onClick={confirmDeleteFactory(tagID)}
+        danger
+      >
+        <span>Delete</span>
       </Menu.Item>
     </Menu>
   );

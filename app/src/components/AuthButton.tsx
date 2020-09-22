@@ -12,8 +12,12 @@ const AuthButton: React.FC = () => {
 
   const menu = (
     <Menu>
-      <Menu.Item key="logout" icon={<LogoutOutlined />}>
-        <span onClick={signOut ?? undefined}>Sign out</span>
+      <Menu.Item
+        key="logout"
+        icon={<LogoutOutlined />}
+        onClick={signOut ?? undefined}
+      >
+        <span>Sign out</span>
       </Menu.Item>
     </Menu>
   );

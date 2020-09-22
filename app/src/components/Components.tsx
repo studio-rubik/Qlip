@@ -158,22 +158,21 @@ const Main = () => {
 
   const moreActionFactory = (compID: string) => (
     <Menu style={{ padding: '4px' }}>
-      <Menu.Item key="detail" icon={<FileTextOutlined />}>
-        <span
-          style={{ padding: '0 8px' }}
-          onClick={() => handleCardClick(compID)}
-        >
-          Detail
-        </span>
+      <Menu.Item
+        key="detail"
+        icon={<FileTextOutlined />}
+        onClick={() => handleCardClick(compID)}
+      >
+        <span style={{ padding: '0 8px' }}>Detail</span>
       </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="delete" icon={<CloseCircleOutlined />} danger>
-        <span
-          style={{ padding: '0 8px' }}
-          onClick={confirmDeleteFactory(compID)}
-        >
-          Delete
-        </span>
+      <Menu.Item
+        danger
+        key="delete"
+        icon={<CloseCircleOutlined />}
+        onClick={confirmDeleteFactory(compID)}
+      >
+        <span style={{ padding: '0 8px' }}>Delete</span>
       </Menu.Item>
     </Menu>
   );
