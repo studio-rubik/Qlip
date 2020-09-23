@@ -183,6 +183,8 @@ function handleMouseOut(e: MouseEvent) {
 }
 
 function handleKeyDown(e: KeyboardEvent) {
+  e.preventDefault();
+  e.stopPropagation();
   switch (e.key) {
     case 's':
       capture();
