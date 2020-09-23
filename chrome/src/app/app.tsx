@@ -102,7 +102,7 @@ const containerStyle: CSSProperties = {
 
 const imgStyle: CSSProperties = {
   maxWidth: '100%',
-  height: 'auto',
+  maxHeight: '70vh',
   marginBottom: 50,
 };
 

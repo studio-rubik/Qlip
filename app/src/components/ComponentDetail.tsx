@@ -198,7 +198,7 @@ const Container = styled.div`
 
 const DetailImg = styled.img`
   max-width: 100%;
-  max-height: 100%;
+  max-height: 70vh;
 `;
 
 export default ComponentDetail;
