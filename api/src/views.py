@@ -113,26 +113,27 @@ def components_get():
 @app.route("/components/<id>", methods=["DELETE"])
 @require_auth
 def components_delete(id: str):
+    component = models.Component.get_or_none(models.Component.id == id)
+    if component.user_id != g.user.id:
+        abort(403)
     models.ComponentTag.delete().where(models.ComponentTag.component == id).execute()
-    models.Component.delete_by_id(id)
+    component.delete_by_id(id)
     return {}, 200
 
 
 @app.route("/tags", methods=["POST"])
 @require_auth
 def tags_post():
-    user_id = request.headers.get("DomClipper-User-ID")
     req = request.get_json()
-    tag = models.Tag.create(name=req.get("name"), user_id=user_id)
+    tag = models.Tag.create(name=req.get("name"), user_id=g.user.id)
     return make_response({"tag": tag.to_dict()})
 
 
 @app.route("/tags", methods=["GET"])
 @require_auth
 def tags_get():
-    user_id = request.headers.get("DomClipper-User-ID")
     tags = models.Tag.select().where(
-        (models.Tag.is_common == True) | (models.Tag.user_id == user_id)
+        (models.Tag.is_common == True) | (models.Tag.user_id == g.user.id)
     )
     return make_response({"tags": Entity([t.to_dict() for t in tags]).to_dict()})
 
@@ -140,6 +141,9 @@ def tags_get():
 @app.route("/tags/<id>", methods=["DELETE"])
 @require_auth
 def tags_delete(id: str):
+    tag = models.Tag.get_or_none(models.Tag.id == id)
+    if tag.user_id != g.user.id:
+        abort(403)
     models.ComponentTag.delete().where(models.ComponentTag.tag == id).execute()
     models.Tag.delete_by_id(id)
     return {}, 200
@@ -148,11 +152,10 @@ def tags_delete(id: str):
 @app.route("/websites", methods=["GET"])
 @require_auth
 def websites_get():
-    user_id = request.headers.get("DomClipper-User-ID")
     sites = (
         models.Website.select(models.Website)
         .join(models.Component)
-        .where(models.Component.user_id == user_id)
+        .where(models.Component.user_id == g.user.id)
         .group_by(models.Website.id)
         .order_by(models.Website.domain)
     )
