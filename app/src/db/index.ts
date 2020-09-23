@@ -6,10 +6,6 @@ export default class ServerRepository implements Repository {
 
   constructor(host: string, port?: number) {
     this.client = new Http(host, port);
-    this.client.beforeRequest((req) => {
-      req.headers.set('DomClipper-User-ID', '109417151843597377124');
-      return req;
-    });
   }
 
   test() {
