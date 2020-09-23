@@ -95,6 +95,7 @@ p {
 .small-title {
   letter-spacing: 1px;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .btn {
@@ -881,7 +882,7 @@ p {
 
 section#subscribe {
   padding-top: 50px;
-  padding-bottom: 50px;
+  padding-bottom: 80px;
 }
 
 .subscribe .form-control {
