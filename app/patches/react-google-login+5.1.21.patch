@@ -1,0 +1,32 @@
+diff --git a/node_modules/react-google-login/src/use-google-login.js b/node_modules/react-google-login/src/use-google-login.js
+index 111038e..5d60219 100644
+--- a/node_modules/react-google-login/src/use-google-login.js
++++ b/node_modules/react-google-login/src/use-google-login.js
+@@ -44,6 +44,7 @@ const useGoogleLogin = ({
+       familyName: basicProfile.getFamilyName()
+     }
+     onSuccess(res)
++    onAutoLoadFinished(true)
+   }
+ 
+   function signIn(e) {
+@@ -98,16 +99,17 @@ const useGoogleLogin = ({
+               if (!unmounted) {
+                 setLoaded(true)
+                 const signedIn = isSignedIn && res.isSignedIn.get()
+-                onAutoLoadFinished(signedIn)
+                 if (signedIn) {
+                   handleSigninSuccess(res.currentUser.get())
++                } else {
++                  onAutoLoadFinished(false)
+                 }
+               }
+             },
+             err => {
+               setLoaded(true)
+-              onAutoLoadFinished(false)
+               onFailure(err)
++              onAutoLoadFinished(false)
+             }
+           )
+         } else if (isSignedIn && GoogleAuth.isSignedIn.get()) {
