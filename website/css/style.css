@@ -956,6 +956,8 @@ section#features {
 }
 
 .component {
+  height: 250px;
+  width: 300px;
   outline:  transparent solid 6px;
   outline-offset: -6px;
   animation: outline 2s linear 0s infinite normal;
@@ -978,7 +980,7 @@ section#features {
 
 @keyframes cursor {
   0% {
-    right: -100px;
+    right: 0;
   }
   20% {
     right: 130px;
@@ -987,11 +989,11 @@ section#features {
 
 
 .camera {
-  width: 92px;
-  height: 92px;
+  width: 72px;
+  height: 72px;
   position: absolute;
-  top: -40px;
-  left: -40px;
+  top: 34px;
+  left: 40px;
 }
 
 /******************
