@@ -88,7 +88,7 @@ def components_get():
 
     if tag is not None:
         components = components.join(models.ComponentTag).where(
-            models.ComponentTag.tag.in_([tag])
+            models.ComponentTag.tag == tag
         )
     if site is not None:
         components = components.join(models.Website).where(models.Website.id == site)
