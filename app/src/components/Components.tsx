@@ -155,12 +155,19 @@ const Main = () => {
       });
   };
 
+  const stopPropagation = (e: any) => {
+    e.stopPropagation();
+  };
+
   const moreActionFactory = (compID: string) => (
     <Menu style={{ padding: '4px' }}>
       <Menu.Item
         key="detail"
         icon={<FileTextOutlined />}
-        onClick={() => handleCardClick(compID)}
+        onClick={(e) => {
+          e.domEvent.stopPropagation();
+          handleCardClick(compID);
+        }}
       >
         <span style={{ padding: '0 8px' }}>Detail</span>
       </Menu.Item>
@@ -168,16 +175,15 @@ const Main = () => {
         danger
         key="delete"
         icon={<CloseCircleOutlined />}
-        onClick={confirmDeleteFactory(compID)}
+        onClick={(e) => {
+          e.domEvent.stopPropagation();
+          confirmDeleteFactory(compID)();
+        }}
       >
         <span style={{ padding: '0 8px' }}>Delete</span>
       </Menu.Item>
     </Menu>
   );
-
-  const stopPropagation = (e: any) => {
-    e.stopPropagation();
-  };
 
   const loaded = true;
 
@@ -231,33 +237,30 @@ const Main = () => {
                           />
                         }
                         onClick={() => handleCardClick(comp.id)}
-                        bodyStyle={{ padding: 12 }}
+                        bodyStyle={{ padding: 10 }}
                       >
-                        <Card.Meta
-                          title={
-                            <span style={{ color: '#777' }}>
-                              {
-                                websites.find((s) => s.id === comp.website)
-                                  ?.domain
-                              }
-                            </span>
-                          }
-                          description={
-                            <div style={{ padding: '6px 0' }}>
-                              {tags
-                                .filter((t) => comp.tagIds.includes(t.id))
-                                .map((t) => (
-                                  <Tag key={t.id}>{t.name}</Tag>
-                                ))}
-                            </div>
-                          }
-                        />
-                        <MoreButtonRow onClick={stopPropagation}>
+                        <CardDomainRow>
+                          <GlobalOutlined />
+                          <CardDomainText>
+                            {
+                              websites.find((s) => s.id === comp.website)
+                                ?.domain
+                            }
+                          </CardDomainText>
+                        </CardDomainRow>
+                        <div>
+                          {tags
+                            .filter((t) => comp.tagIds.includes(t.id))
+                            .map((t) => (
+                              <Tag key={t.id}>{t.name}</Tag>
+                            ))}
+                        </div>
+                        <MoreButtonRow>
                           <Dropdown
                             overlay={moreActionFactory(comp.id)}
                             trigger={['click']}
                           >
-                            <MoreButton>
+                            <MoreButton onClick={stopPropagation}>
                               <EllipsisOutlined style={{ fontSize: 22 }} />
                             </MoreButton>
                           </Dropdown>
@@ -300,6 +303,17 @@ const CardsContainer = styled.div`
 
 const CardImg = styled.img`
   image-rendering: -webkit-optimize-contrast;
+  padding: 10px;
+`;
+
+const CardDomainRow = styled.div`
+  color: #888;
+  font-size: 14px;
+  padding-bottom: 10px;
+`;
+
+const CardDomainText = styled.span`
+  margin-left: 5px;
 `;
 
 const MoreButtonRow = styled.div`

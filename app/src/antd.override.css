@@ -1,3 +1,11 @@
 .ant-menu-item-selected div {
   color: white;
 }
+
+.ant-card-bordered {
+  box-shadow: 0 1px 3px -2px rgba(0, 0, 0, 0.6);
+}
+
+.ant-page-header {
+  box-shadow: 0 1px 3px -2px rgba(0, 0, 0, 0.6);
+}
