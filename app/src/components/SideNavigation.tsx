@@ -172,10 +172,10 @@ const LogoWrapper = styled.div`
   padding: 8px;
   display: flex;
   align-items: center;
-  justify-content: center;
 `;
 
 const StyledLogoIcon = styled(LogoIcon)`
+  margin-left: 38px;
   display: block;
   height: 17px;
   width: 34px;
