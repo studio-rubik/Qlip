@@ -217,7 +217,7 @@ const Main = () => {
               endMessage={fetchedMore ? <EndMsg>EOF</EndMsg> : null}
             >
               {components.length > 0 ? (
-                <Row gutter={[16, 16]}>
+                <Row gutter={[16, 16]} style={{ margin: 0 }}>
                   {components.map((comp) => (
                     <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
                       <Card
@@ -290,7 +290,7 @@ const Main = () => {
 };
 
 const CardsContainer = styled.div`
-  padding: 16px;
+  padding: 8px;
 `;
 
 const CardImg = styled.img`
