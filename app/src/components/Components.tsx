@@ -235,7 +235,12 @@ const Main = () => {
                       >
                         <Card.Meta
                           title={
-                            websites.find((s) => s.id === comp.website)?.domain
+                            <span style={{ color: '#777' }}>
+                              {
+                                websites.find((s) => s.id === comp.website)
+                                  ?.domain
+                              }
+                            </span>
                           }
                           description={
                             <div style={{ padding: '6px 0' }}>
