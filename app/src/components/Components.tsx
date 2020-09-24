@@ -210,9 +210,9 @@ const Main = () => {
               next={fetchData}
               hasMore={hasMore}
               loader={
-                <FlexCenter>
+                <SpinWrapper>
                   <Spin />
-                </FlexCenter>
+                </SpinWrapper>
               }
               endMessage={fetchedMore ? <EndMsg>EOF</EndMsg> : null}
             >
@@ -313,7 +313,8 @@ const MoreButton = styled.div`
   }
 `;
 
-const FlexCenter = styled.div`
+const SpinWrapper = styled.div`
+  margin-top: 20px;
   display: flex;
   justify-content: center;
 `;
