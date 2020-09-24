@@ -18,8 +18,10 @@ import useRepository, {
   useFetchWebsites,
 } from '../hooks/useRepository';
 import { useStore } from '../store';
+import { ReactComponent as LogoIcon } from '../parts/logo-icon.svg';
+import { ReactComponent as LogoText } from '../parts/logo-text.svg';
 
-const LOGO_HEIGHT = 50;
+const LOGO_HEIGHT = 44;
 
 function SideNavigation() {
   const repo = useRepository();
@@ -98,7 +100,10 @@ function SideNavigation() {
         className="site-layout-background"
       >
         <Link to="/">
-          <Logo>DOMCLIPPER</Logo>
+          <LogoWrapper>
+            <StyledLogoIcon />
+            <StyledLogoText />
+          </LogoWrapper>
         </Link>
         <Menu
           theme="dark"
@@ -161,13 +166,26 @@ function SideNavigation() {
   );
 }
 
-const Logo = styled.div`
-  color: #da50af;
+const LogoWrapper = styled.div`
   height: ${LOGO_HEIGHT}px;
-  line-height: ${LOGO_HEIGHT}px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
+  width: 100%;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StyledLogoIcon = styled(LogoIcon)`
+  display: block;
+  height: 17px;
+  width: 34px;
+`;
+
+const StyledLogoText = styled(LogoText)`
+  display: block;
+  height: 28px;
+  width: 48px;
+  padding: 4px 0 0 8px;
 `;
 
 const MenuItemContent = styled.div`
