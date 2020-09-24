@@ -18,7 +18,7 @@ function App() {
 
   return (
     <>
-      <Helmet titleTemplate="%s - DomClipper" defaultTitle="DomClipper" />
+      <Helmet titleTemplate="%s - Qlip" defaultTitle="Qlip Showcase" />
       {authLoaded ? (
         <Layout>
           <SideNavigation />
