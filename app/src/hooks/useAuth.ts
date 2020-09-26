@@ -4,8 +4,11 @@ import { useGoogleLogin, useGoogleLogout } from 'react-google-login';
 
 import { useStore } from '../store';
 
-const clientId =
-  '45191155617-8uphjoe3igi9g8p1ocak6ocka28sqs4b.apps.googleusercontent.com';
+const clientId = process.env.REACT_APP_GOOGLE_APP_ID;
+
+if (clientId == null) {
+  throw new Error('REACT_APP_GOOGLE_APP_ID is undefined');
+}
 
 export default () => {
   const set = useStore((store) => store.set);
