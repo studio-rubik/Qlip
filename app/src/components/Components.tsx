@@ -108,7 +108,7 @@ const Main = () => {
     const titleFactory = (icon: any, text: string) => (
       <span>
         {icon}
-        <span style={{ paddingLeft: 10 }}>{text}</span>
+        <span style={{ paddingLeft: 10, color: '#333' }}>{text}</span>
       </span>
     );
     if (id == null)

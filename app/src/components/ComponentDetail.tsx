@@ -177,7 +177,12 @@ const ComponentDetail: React.FC<Props> = ({
         </Col>
       </Row>
       <Row style={{ padding: '22px 0' }} justify="center">
-        <Button type="primary" loading={submitting} onClick={handleUpdateClick}>
+        <Button
+          type="primary"
+          shape="round"
+          loading={submitting}
+          onClick={handleUpdateClick}
+        >
           Save
         </Button>
       </Row>
