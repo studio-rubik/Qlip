@@ -23,6 +23,7 @@
 
 #dc-keybindings ul {
     padding: 0;
+    list-style: none;
 }
 
 #dc-keybindings li {
