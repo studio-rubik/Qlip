@@ -168,10 +168,21 @@ def websites_get():
 @require_auth
 def component_tags_post(component_id: str, tag_ids: str):
     comp = models.Component.get_or_none(models.Component.id == component_id)
-    tags = models.Tag.select().where(models.Tag.id.in_(tag_ids.split(",")))
+
     if comp is None:
         abort(400)
+    if tag_ids is None:
+        comp.tags.clear()
+        return {}, 200
+
+    tags = models.Tag.select().where(models.Tag.id.in_(tag_ids.split(",")))
     comp.tags.clear()
     comp.tags.add(list(tags))
 
     return {}, 200
+
+
+@app.route("/components/<component_id>/tags/", methods=["POST"])
+@require_auth
+def component_tags_empty_post(component_id: str):
+    return component_tags_post(component_id, None)
