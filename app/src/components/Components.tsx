@@ -239,15 +239,6 @@ const Main = () => {
                         onClick={() => handleCardClick(comp.id)}
                         bodyStyle={{ padding: 10 }}
                       >
-                        <CardDomainRow>
-                          <GlobalOutlined />
-                          <CardDomainText>
-                            {
-                              websites.find((s) => s.id === comp.website)
-                                ?.domain
-                            }
-                          </CardDomainText>
-                        </CardDomainRow>
                         <div>
                           {tags
                             .filter((t) => comp.tagIds.includes(t.id))
@@ -256,6 +247,15 @@ const Main = () => {
                             ))}
                         </div>
                         <MoreButtonRow>
+                          <CardDomain>
+                            <GlobalOutlined />
+                            <CardDomainText>
+                              {
+                                websites.find((s) => s.id === comp.website)
+                                  ?.domain
+                              }
+                            </CardDomainText>
+                          </CardDomain>
                           <Dropdown
                             overlay={moreActionFactory(comp.id)}
                             trigger={['click']}
@@ -278,7 +278,7 @@ const Main = () => {
             isOpen={modalOpen}
             onRequestClose={closeModal}
             shouldCloseOnOverlayClick
-            style={{ overlay: { background: '#0008' } }}
+            style={ModalStyle}
           >
             {selectedItems != null ? (
               <ComponentDetail
@@ -297,19 +297,22 @@ const Main = () => {
   );
 };
 
+const ModalStyle: Modal.Styles = {
+  content: { borderRadius: 10 },
+  overlay: { background: '#0008' },
+};
+
 const CardsContainer = styled.div`
   padding: 8px;
 `;
 
 const CardImg = styled.img`
   image-rendering: -webkit-optimize-contrast;
-  padding: 10px;
 `;
 
-const CardDomainRow = styled.div`
+const CardDomain = styled.div`
   color: #888;
   font-size: 14px;
-  padding-bottom: 10px;
 `;
 
 const CardDomainText = styled.span`
@@ -318,8 +321,8 @@ const CardDomainText = styled.span`
 
 const MoreButtonRow = styled.div`
   display: flex;
-  margin-top: 8px;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const MoreButton = styled.div`

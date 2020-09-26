@@ -3,9 +3,28 @@
 }
 
 .ant-card-bordered {
+  border-radius: 10px;
   box-shadow: 0 1px 3px -2px rgba(0, 0, 0, 0.6);
+}
+
+.ant-card-cover img {
+  border-radius: 10px  10px 0 0;
 }
 
 .ant-page-header {
   box-shadow: 0 1px 3px -2px rgba(0, 0, 0, 0.6);
+}
+
+.ant-tag {
+  border-radius: 4px;
+  background: transparent;
+  border-color: #bbb;
+  padding: 0 8px;
+  color: #777;
+  line-height: 18px;
+  margin-bottom: 6px;
+}
+
+.ant-tag:hover {
+  opacity: 1;
 }

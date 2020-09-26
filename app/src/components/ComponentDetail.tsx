@@ -171,7 +171,8 @@ const ComponentDetail: React.FC<Props> = ({
               style={{
                 verticalAlign: 'middle',
                 marginLeft: 12,
-                background: '#fff',
+                marginBottom: 0,
+                lineHeight: '22px',
                 borderStyle: 'dashed',
               }}
               onClick={handleNewTagClick}
@@ -190,15 +191,12 @@ const ComponentDetail: React.FC<Props> = ({
   );
 };
 
-const Container = styled.div`
-  padding: 20px;
-  width: 100%;
-  height: 100%;
-`;
+const Container = styled.div``;
 
 const DetailImg = styled.img`
   max-width: 100%;
-  max-height: 70vh;
+  max-height: 50vh;
+  border-radius: 10px;
 `;
 
 export default ComponentDetail;
