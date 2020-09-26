@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import styled from 'styled-components';
 import {
   Input,
   Select,
@@ -9,17 +10,12 @@ import {
   Divider,
   notification,
 } from 'antd';
-import {
-  PlusOutlined,
-  TagsFilled,
-  GlobalOutlined,
-  ClockCircleOutlined,
-} from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 
 import { fromUTC } from '../common/utils';
 import useRepository from '../hooks/useRepository';
 import { useStore } from '../store/';
-import styled from 'styled-components';
+import Icons from './Icons';
 
 type Props = {
   component: any;
@@ -112,8 +108,6 @@ const ComponentDetail: React.FC<Props> = ({
     }
   };
 
-  const iconStyle = { fontSize: 18, marginRight: 10 };
-
   return (
     <Container>
       <Row>
@@ -123,11 +117,11 @@ const ComponentDetail: React.FC<Props> = ({
       </Row>
       <Divider />
       <Row align="middle" gutter={[0, 24]}>
-        <ClockCircleOutlined style={iconStyle} />
+        <Icons.Clock style={iconStyle} />
         {fromUTC.toRelative(component.updatedAt)}
       </Row>
       <Row align="middle">
-        <GlobalOutlined style={iconStyle} />
+        <Icons.Globe style={iconStyle} />
         <a
           href={`https://${website.domain}`}
           target="_blank"
@@ -137,7 +131,7 @@ const ComponentDetail: React.FC<Props> = ({
         </a>
       </Row>
       <Row align="middle">
-        <TagsFilled style={iconStyle} alt="tags" />
+        <Icons.Tags style={iconStyle} />
         <Col md={{ span: 12, offset: 0 }} xs={{ span: 18 }}>
           <Select
             mode="multiple"
@@ -189,6 +183,13 @@ const ComponentDetail: React.FC<Props> = ({
       </Row>
     </Container>
   );
+};
+
+const iconStyle: React.CSSProperties = {
+  width: 18,
+  fontSize: 18,
+  marginRight: 10,
+  color: '#666',
 };
 
 const Container = styled.div``;

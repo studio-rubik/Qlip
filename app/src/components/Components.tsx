@@ -14,9 +14,6 @@ import {
   notification,
 } from 'antd';
 import {
-  TagFilled,
-  GlobalOutlined,
-  BarsOutlined,
   EllipsisOutlined,
   CloseCircleOutlined,
   ExclamationCircleOutlined,
@@ -30,6 +27,7 @@ import useRepository, { useFetchComponents } from '../hooks/useRepository';
 import { useStore } from '../store/';
 import styled from 'styled-components';
 
+import Icons from './Icons';
 import ComponentDetail from './ComponentDetail';
 import AuthButton from './AuthButton';
 
@@ -115,16 +113,16 @@ const Main = () => {
     );
     if (id == null)
       return titleFactory(
-        <BarsOutlined style={{ color: color.primary }} />,
+        <Icons.List style={{ color: color.primary }} />,
         'All Components',
       );
     return queries.get('tag') != null
       ? titleFactory(
-          <TagFilled style={{ color: color.primary }} />,
+          <Icons.Tag style={{ color: color.primary }} />,
           tags.find((t) => t.id === id)?.name,
         )
       : titleFactory(
-          <GlobalOutlined style={{ color: color.primary }} />,
+          <Icons.Globe style={{ color: color.primary }} />,
           websites.find((w) => w.id === id)?.domain,
         );
   }, [location.search, tags, websites]);
@@ -249,7 +247,7 @@ const Main = () => {
                       >
                         <CardDomainRow>
                           <div>
-                            <GlobalOutlined />
+                            <Icons.Globe />
                             <CardDomainText>
                               {
                                 websites.find((s) => s.id === comp.website)

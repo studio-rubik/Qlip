@@ -4,8 +4,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Modal, message } from 'antd';
 import {
   CloseCircleOutlined,
-  TagsOutlined,
-  GlobalOutlined,
   EllipsisOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
@@ -20,6 +18,7 @@ import useRepository, {
 import { useStore } from '../store';
 import { ReactComponent as LogoIcon } from '../parts/logo-icon.svg';
 import { ReactComponent as LogoText } from '../parts/logo-text.svg';
+import Icons from './Icons';
 
 const LOGO_HEIGHT = 44;
 
@@ -116,7 +115,7 @@ function SideNavigation() {
           <Menu.SubMenu
             key="tag"
             title="Tags"
-            icon={<TagsOutlined style={{ color: color.primary }} />}
+            icon={<Icons.Tags style={iconStyle} />}
           >
             {tags.map((t) => (
               <Menu.Item
@@ -152,7 +151,7 @@ function SideNavigation() {
           <Menu.SubMenu
             key="website"
             title="Websites"
-            icon={<GlobalOutlined style={{ color: color.primary }} />}
+            icon={<Icons.Globe style={iconStyle} />}
           >
             {websites.map((w) => (
               <Menu.Item key={w.id}>
@@ -165,6 +164,12 @@ function SideNavigation() {
     </>
   );
 }
+
+const iconStyle: React.CSSProperties = {
+  color: color.primary,
+  marginRight: 8,
+  width: 14,
+};
 
 const LogoWrapper = styled.div`
   height: ${LOGO_HEIGHT}px;
