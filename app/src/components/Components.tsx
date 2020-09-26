@@ -201,6 +201,14 @@ const Main = () => {
     }
   };
 
+  const MoreButton: React.FC<{ compID: string }> = ({ compID }) => (
+    <Dropdown overlay={moreActionFactory(compID)} trigger={['click']}>
+      <More onClick={stopPropagation}>
+        <EllipsisOutlined style={{ fontSize: 22 }} />
+      </More>
+    </Dropdown>
+  );
+
   return (
     <>
       <PageHeader
@@ -239,15 +247,8 @@ const Main = () => {
                         onClick={() => handleCardClick(comp.id)}
                         bodyStyle={{ padding: 10 }}
                       >
-                        <div>
-                          {tags
-                            .filter((t) => comp.tagIds.includes(t.id))
-                            .map((t) => (
-                              <Tag key={t.id}>{t.name}</Tag>
-                            ))}
-                        </div>
-                        <MoreButtonRow>
-                          <CardDomain>
+                        <CardDomainRow>
+                          <div>
                             <GlobalOutlined />
                             <CardDomainText>
                               {
@@ -255,16 +256,25 @@ const Main = () => {
                                   ?.domain
                               }
                             </CardDomainText>
-                          </CardDomain>
-                          <Dropdown
-                            overlay={moreActionFactory(comp.id)}
-                            trigger={['click']}
-                          >
-                            <MoreButton onClick={stopPropagation}>
-                              <EllipsisOutlined style={{ fontSize: 22 }} />
-                            </MoreButton>
-                          </Dropdown>
-                        </MoreButtonRow>
+                          </div>
+                          {tags.filter((t) => comp.tagIds.includes(t.id))
+                            .length === 0 ? (
+                            <MoreButton compID={comp.id} />
+                          ) : null}
+                        </CardDomainRow>
+                        {tags.filter((t) => comp.tagIds.includes(t.id)).length >
+                        0 ? (
+                          <TagRow>
+                            <div>
+                              {tags
+                                .filter((t) => comp.tagIds.includes(t.id))
+                                .map((t) => (
+                                  <Tag key={t.id}>{t.name}</Tag>
+                                ))}
+                            </div>
+                            <MoreButton compID={comp.id} />
+                          </TagRow>
+                        ) : null}
                       </Card>
                     </Col>
                   ))}
@@ -310,7 +320,9 @@ const CardImg = styled.img`
   image-rendering: -webkit-optimize-contrast;
 `;
 
-const CardDomain = styled.div`
+const CardDomainRow = styled.div`
+  display: flex;
+  justify-content: space-between;
   color: #888;
   font-size: 14px;
 `;
@@ -319,13 +331,14 @@ const CardDomainText = styled.span`
   margin-left: 5px;
 `;
 
-const MoreButtonRow = styled.div`
+const TagRow = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
+  padding-top: 6px;
 `;
 
-const MoreButton = styled.div`
+const More = styled.div`
   width: 26px;
   height: 26px;
   border-radius: 4px;
