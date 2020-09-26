@@ -116,7 +116,7 @@ const ComponentDetail: React.FC<Props> = ({
         </Col>
       </Row>
       <Divider />
-      <Row align="middle" gutter={[0, 24]}>
+      <Row align="middle" gutter={[0, 24]} style={{ color: '#666' }}>
         <Icons.Clock style={iconStyle} />
         {fromUTC.toRelative(component.updatedAt)}
       </Row>
