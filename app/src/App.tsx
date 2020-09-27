@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Helmet from 'react-helmet';
+import ReactGA from 'react-ga';
 import { Layout, Spin } from 'antd';
 import 'antd/dist/antd.css';
 import './antd.override.css';
@@ -11,6 +12,11 @@ import useAuth from './hooks/useAuth';
 import { useStore } from './store';
 
 const { Content } = Layout;
+
+if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) {
+  ReactGA.initialize(process.env.REACT_APP_GOOGLE_ANALYTICS_ID);
+  ReactGA.pageview(window.location.pathname + window.location.search);
+}
 
 function App() {
   useAuth();
