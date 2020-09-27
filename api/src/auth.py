@@ -5,6 +5,7 @@ from google.auth.transport import requests
 
 from .exceptions import AuthError
 from .domain import User
+from .app import app
 
 ALGORITHMS = ["RS256"]
 
@@ -58,9 +59,15 @@ def require_auth(f):
         token = get_token_auth_header()
         try:
             idinfo = id_token.verify_oauth2_token(token, requests.Request())
+            if idinfo["aud"] not in [
+                app.config["GOOGLE_WEB_CLIENT_ID"],
+                app.config["GOOGLE_CHROME_CLIENT_ID"],
+            ]:
+                raise ValueError("Could not verify audience.")
             userid = idinfo["sub"]
             g.user = User(id=userid)
-        except ValueError:
+        except ValueError as e:
+            print(e)
             raise AuthError(error="Invalid token", status_code=401)
 
         return f(*args, **kwargs)

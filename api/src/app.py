@@ -13,17 +13,10 @@ app.config["AWS_S3_PUBLIC_URL"] = os.getenv("AWS_S3_PUBLIC_URL", None)
 if not app.config["AWS_S3_PUBLIC_URL"]:
     raise RuntimeError("AWS_S3_PUBLIC_URL is not set")
 
-app.config["AUTH0_DOMAIN"] = os.getenv("AUTH0_DOMAIN")
-app.config["AUTH0_CLIENT_ID"] = os.getenv("AUTH0_CLIENT_ID")
-app.config["AUTH0_CLIENT_SECRET"] = os.getenv("AUTH0_CLIENT_SECRET")
-app.config["AUTH0_API_AUDIENCE"] = os.getenv("AUTH0_API_AUDIENCE")
-if (
-    not app.config["AUTH0_DOMAIN"]
-    or not app.config["AUTH0_CLIENT_ID"]
-    or not app.config["AUTH0_CLIENT_SECRET"]
-    or not app.config["AUTH0_API_AUDIENCE"]
-):
-    raise RuntimeError("Some environment variable for Auth0 is not set")
+app.config["GOOGLE_WEB_CLIENT_ID"] = os.getenv("GOOGLE_WEB_CLIENT_ID")
+app.config["GOOGLE_CHROME_CLIENT_ID"] = os.getenv("GOOGLE_CHROME_CLIENT_ID")
+if not app.config["GOOGLE_WEB_CLIENT_ID"] or not app.config["GOOGLE_CHROME_CLIENT_ID"]:
+    raise RuntimeError("GOOGLE_WEB_CLIENT_ID or GOOGLE_CHROME_CLIENT_ID is not set")
 
 
 DSN = os.getenv("DSN")
