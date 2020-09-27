@@ -144,4 +144,5 @@ static
 data
 storage
 
+credentials/
 docker-compose.override.yaml
