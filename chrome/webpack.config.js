@@ -13,7 +13,7 @@ const mode =
 module.exports = {
   devtool: 'inline-source-map',
   mode: mode,
-  watch: true,
+  watch: mode === 'production' ? false : true,
 
   entry: {
     content: './src/app/content.tsx',
