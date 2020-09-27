@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 
 const API_URL = {
-  production: JSON.stringify('prod-url'),
+  production: JSON.stringify('https://api.qlip.page'),
   development: JSON.stringify('http://localhost:5000'),
 };
 
