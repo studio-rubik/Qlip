@@ -12,7 +12,7 @@ const Auth: React.FC = () => {
         <Col>Please open the door...</Col>
       </Row>
       <Row justify="center">
-        <Col>
+        <Col span={6}>
           <SignInImg />
         </Col>
       </Row>
