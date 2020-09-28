@@ -707,6 +707,7 @@ p {
   margin-bottom: 0px;
   -webkit-transition: all 0.5s ease-in-out;
   transition: all 0.5s ease-in-out;
+  background: #fffa;
 }
 
 .navbar-custom .navbar-nav .nav-item .nav-link {
@@ -826,7 +827,7 @@ p {
 }
 
 .hero-img {
-  max-height: 400px;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 .home-img::before {
@@ -997,6 +998,22 @@ section#features {
   left: 40px;
 }
 
+p {
+  font-size: 18px;
+}
+
+li {
+  font-size: 16px;
+}
+
+img {
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.showcase {
+  padding: 0;
+}
+
 /******************
     9.Responsive
 *******************/
@@ -1039,10 +1056,16 @@ section#features {
 }
 
 @media (max-width: 767.98px) {
-  .hero-title {
+  .hero-section-2 {
     font-size: 36px;
     text-align: center;
   }
+
+  .hero-section-2 .btn-primary {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
 }
 
 @media (max-width: 575.98px) {
