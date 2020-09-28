@@ -33,7 +33,7 @@ import AuthButton from './AuthButton';
 
 const { confirm } = AntModal;
 
-const limit = 10;
+const limit = 12;
 
 const Main = () => {
   const token = useStore((store) => store.idToken);
