@@ -113,6 +113,9 @@ function tilStyleApplied(
 async function capture() {
   if (selected == null) return;
   const target = selected;
+  if (keybindings) {
+    keybindings.style.display = 'none';
+  }
   deselect(selected);
   await tilStyleApplied(target, {
     outline: savedOutline,
