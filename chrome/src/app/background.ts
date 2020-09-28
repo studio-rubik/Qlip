@@ -69,34 +69,34 @@ function fetchIdToken(resp: any) {
   resp({ type: 'idToken', data: { idToken } });
 }
 
-async function injectContentScript() {
-  return new Promise((resolve) => {
-    chrome.tabs.query({ active: true }, (tabs) => {
-      const tabId = tabs[0].id;
-      if (tabId == null) return;
-      chrome.tabs.executeScript(
-        tabId,
-        {
-          code: "document.getElementById('dc-root') == null",
-        },
-        (res) => {
-          if (res[0] === true) {
-            chrome.tabs.executeScript(
-              tabId,
-              {
-                file: '/js/content.js',
-                runAt: 'document_start',
-              },
-              () => {
-                resolve();
-              },
-            );
-          } else {
-            resolve();
-          }
-        },
-      );
-    });
+async function injectContentScript(tabId: number) {
+  return new Promise((resolve, reject) => {
+    if (tabId == null) {
+      reject();
+      return;
+    }
+    chrome.tabs.executeScript(
+      tabId,
+      {
+        code: "document.getElementById('dc-root') == null",
+      },
+      (res) => {
+        if (res[0] === true) {
+          chrome.tabs.executeScript(
+            tabId,
+            {
+              file: '/js/content.js',
+              runAt: 'document_start',
+            },
+            () => {
+              resolve();
+            },
+          );
+        } else {
+          resolve();
+        }
+      },
+    );
   });
 }
 
@@ -117,7 +117,7 @@ function handleCaptureMsg(
   msg: CaptureMsg,
   res: (respData: CaptureMsgResp) => void,
 ) {
-  chrome.tabs.query({ active: true }, (tab) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
     chrome.tabs.captureVisibleTab(
       tab[0].windowId,
       { format: 'png' },
@@ -161,9 +161,9 @@ async function toggleCapture() {
   if (idToken === '') {
     await startSignInFlow();
   }
-  chrome.tabs.query({ active: true }, async (tab) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, async (tab) => {
     if (tab[0].id == null) return;
-    await injectContentScript();
+    await injectContentScript(tab[0].id);
     chrome.tabs.sendMessage(
       tab[0].id,
       { type: 'capture.toggle.request' },
