@@ -4,6 +4,16 @@
     left: 0;
 }
 
+#dc-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #0000;
+    z-index: 9999999;
+}
+
 #dc-keybindings {
     font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
     position: fixed;
@@ -11,7 +21,7 @@
     right: 12px;
     font-size: 26px;
     color: #777;
-    z-index: 9999999;
+    z-index: 999999999;
     cursor: pointer;
     width: 160px;
     height: 130px;

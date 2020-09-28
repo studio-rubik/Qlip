@@ -7,6 +7,7 @@ const MARGIN = 20;
 
 let selected: HTMLElement | null = null;
 let reactRoot: HTMLDivElement | null = null;
+let overlay: HTMLDivElement | null = null;
 let keybindings: HTMLDivElement | null = null;
 let clickToHide: HTMLDivElement | null = null;
 let keybindingsContent: HTMLUListElement | null = null;
@@ -19,6 +20,12 @@ function createReactRoot() {
   root.style.display = 'none';
   root.setAttribute('id', 'dc-root');
   return root;
+}
+
+function createOverlay() {
+  const overlay = document.createElement('div');
+  overlay.setAttribute('id', 'dc-overlay');
+  return overlay;
 }
 
 const keyActions = [
@@ -50,18 +57,19 @@ function createKeybindings() {
   const keybindings = document.createElement('div');
   createKeybindingsContent();
   keybindings.setAttribute('id', 'dc-keybindings');
-  keybindings.addEventListener('mouseover', (e: MouseEvent) => {
+  keybindings.addEventListener('mouseenter', (e: MouseEvent) => {
     e.stopPropagation();
     if (keybindingsContent && clickToHide) {
       keybindings.replaceChild(clickToHide, keybindingsContent);
     }
   });
-  keybindings.addEventListener('mouseout', () => {
+  keybindings.addEventListener('mouseleave', () => {
     if (keybindingsContent && clickToHide) {
       keybindings.replaceChild(keybindingsContent, clickToHide);
     }
   });
-  keybindings.addEventListener('click', () => {
+  keybindings.addEventListener('click', (e) => {
+    e.stopPropagation();
     keybindings.style.display = 'none';
   });
   keybindings.appendChild(keybindingsContent!);
@@ -70,8 +78,10 @@ function createKeybindings() {
 
 function init() {
   reactRoot = createReactRoot();
+  overlay = createOverlay();
   keybindings = createKeybindings();
   document.body.appendChild(reactRoot);
+  document.body.appendChild(overlay);
   document.body.appendChild(keybindings);
 }
 
@@ -102,13 +112,14 @@ function tilStyleApplied(
 
 async function capture() {
   if (selected == null) return;
-  disableExtension();
-  await tilStyleApplied(selected, {
+  const target = selected;
+  deselect(selected);
+  await tilStyleApplied(target, {
     outline: savedOutline,
     outlineOffset: savedOffset,
     zIndex: savedZIndex,
   });
-  const clientRect = selected.getBoundingClientRect();
+  const clientRect = target.getBoundingClientRect();
   const rect = {
     x: clientRect.x - MARGIN,
     y: clientRect.y - MARGIN,
@@ -124,8 +135,7 @@ async function capture() {
     (res) => {
       if (selected == null) return;
       enabled = false;
-      selected.removeEventListener('click', capture);
-      document.removeEventListener('mouseover', handleMouseOver);
+      disableExtension();
       if (reactRoot != null) {
         reactRoot.style.display = 'block';
       }
@@ -141,9 +151,9 @@ function select(elm: HTMLElement | null = null) {
   savedOutline = selected.style.outline;
   savedOffset = selected.style.outlineOffset;
   savedZIndex = selected.style.zIndex;
-  selected.style.outline = `#619ec988 solid 5px`;
-  selected.style.outlineOffset = '-5px';
-  selected.style.zIndex = '100000';
+  selected.style.outline = `#619ec988 solid 8px`;
+  selected.style.outlineOffset = '-8px';
+  selected.style.zIndex = '999999';
 }
 
 function deselect(elm: HTMLElement | null = null) {
@@ -159,27 +169,38 @@ function deselect(elm: HTMLElement | null = null) {
 function selectParent() {
   if (selected == null) return;
   const parent = selected.parentNode;
-  if (parent) {
+  if (parent instanceof HTMLElement) {
     deselect(selected);
-    select(parent as HTMLElement);
+    select(parent);
   }
 }
 
 function selectChild() {
   if (selected == null) return;
   const child = selected.children[0];
-  if (child) {
+  if (child instanceof HTMLElement) {
     deselect(selected);
-    select(child as HTMLElement);
+    select(child);
   }
 }
 
-function handleMouseOver(e: MouseEvent) {
-  select(e.target as HTMLElement);
+function handleMouseMove(e: MouseEvent) {
+  const elms = document.elementsFromPoint(e.x, e.y);
+  const elm = elms.filter((e) => e !== overlay)[0];
+  if (
+    elm !== selected &&
+    elm !== keybindings &&
+    elm !== keybindingsContent &&
+    elm !== clickToHide &&
+    elm instanceof HTMLElement
+  ) {
+    deselect(selected);
+    select(elm);
+  }
 }
 
-function handleMouseOut(e: MouseEvent) {
-  deselect(e.target as HTMLElement);
+function handleClick() {
+  capture();
 }
 
 function handleKeyDown(e: KeyboardEvent) {
@@ -204,22 +225,24 @@ function handleKeyDown(e: KeyboardEvent) {
 let enabled = false;
 
 function enableExtension() {
-  if (keybindings) {
+  if (overlay && keybindings) {
+    overlay.style.display = 'block';
     keybindings.style.display = 'flex';
   }
-  document.addEventListener('mouseover', handleMouseOver);
-  document.addEventListener('mouseout', handleMouseOut);
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('click', handleClick);
   document.addEventListener('keydown', handleKeyDown);
   enabled = true;
 }
 
 function disableExtension() {
   selected && deselect(selected);
-  if (keybindings) {
+  if (overlay && keybindings) {
+    overlay.style.display = 'none';
     keybindings.style.display = 'none';
   }
-  document.removeEventListener('mouseover', handleMouseOver);
-  document.removeEventListener('mouseout', handleMouseOut);
+  document.removeEventListener('mousemove', handleMouseMove);
+  document.removeEventListener('click', handleClick);
   document.removeEventListener('keydown', handleKeyDown);
   enabled = false;
 }
