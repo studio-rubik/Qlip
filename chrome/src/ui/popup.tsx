@@ -53,12 +53,23 @@ const App: React.FC = () => {
         <SignInButton loading={sending} onClick={signIn} />
       ) : null}
       {idToken !== '' ? (
-        <div>
-          <IconButton src="/img/area.png" onClick={toggleCapture}>
-            {enabled ? 'Stop' : 'Capture'}
-          </IconButton>
-          <span className="keybinding">{keybinding}</span>
-        </div>
+        <>
+          <div className="capture">
+            <div>
+              <IconButton src="/img/area.png" onClick={toggleCapture}>
+                {enabled ? 'Stop' : 'Capture'}
+              </IconButton>
+            </div>
+            <div>
+              <span className="keybinding">{keybinding}</span>
+            </div>
+          </div>
+          <div className="open-showcase">
+            <a href="https://app.qlip.page" target="_blank" rel="noreferrer">
+              Open showcase
+            </a>
+          </div>
+        </>
       ) : null}
     </div>
   );
