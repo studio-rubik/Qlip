@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import {
   Input,
@@ -108,11 +108,30 @@ const ComponentDetail: React.FC<Props> = ({
     }
   };
 
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    if (containerRef.current == null || imgRef.current == null) return;
+
+    const rect = containerRef.current?.getBoundingClientRect();
+    const w = component.width >= rect.width ? -1 : component.width;
+    if (w === -1) {
+      imgRef.current.style.maxWidth = '100%';
+      imgRef.current.style.height = 'auto';
+    } else {
+      imgRef.current.style.width = w + 'px';
+      imgRef.current.style.height = component.height + 'px';
+    }
+  }, [component.height, component.width]);
+
   return (
-    <Container>
-      <Row>
+    <Container ref={containerRef}>
+      <Row style={{ flex: 1 }}>
         <Col span={24} style={{ textAlign: 'center' }}>
-          <DetailImg src={file.url} />
+          <DetailImgWrapper>
+            <DetailImg ref={imgRef} src={file.url} />
+          </DetailImgWrapper>
         </Col>
       </Row>
       <Divider />
@@ -197,11 +216,21 @@ const iconStyle: React.CSSProperties = {
   color: '#666',
 };
 
-const Container = styled.div``;
+const Container = styled.div`
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const DetailImgWrapper = styled.div`
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const DetailImg = styled.img`
-  max-width: 100%;
-  max-height: 50vh;
+  display: inline-block;
   border-radius: 10px;
 `;
 
