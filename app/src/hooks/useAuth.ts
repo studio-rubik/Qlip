@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { message } from 'antd';
-import { useGoogleLogin, useGoogleLogout } from 'react-google-login';
 
 import { useStore } from '../store';
 
@@ -13,50 +12,62 @@ if (clientId == null) {
 export default () => {
   const set = useStore((store) => store.set);
 
-  const handleSuccess = (resp: any) => {
-    set((store) => {
-      store.idToken = resp.getAuthResponse().id_token;
-    });
-    message.success('You are signed in!');
-  };
+  const handleSignIn = useCallback(
+    (user: gapi.auth2.GoogleUser) => {
+      console.log(user.getAuthResponse().id_token);
+      set((store) => {
+        store.idToken = user.getAuthResponse().id_token;
+      });
+      set((store) => {
+        store.authLoaded = true;
+      });
+      message.success(`Hi, ${user.getBasicProfile().getName()}`);
+    },
+    [set],
+  );
 
-  const handleFailure = (resp: any) => {
-    console.log('onFailure');
-  };
-
-  const handleAutoLoadFinished = (_: boolean) => {
-    set((store) => {
-      store.authLoaded = true;
-    });
-  };
-
-  const handleLogoutSuccess = () => {
+  const handleSignOut = useCallback(() => {
     set((store) => {
       store.idToken = '';
     });
-    message.success('You are signed out');
+    set((store) => {
+      store.authLoaded = true;
+    });
+  }, [set]);
+
+  const handleError = (resp: any) => {
+    console.debug(resp);
   };
 
-  const { signIn } = useGoogleLogin({
-    clientId,
-    cookiePolicy: 'single_host_origin',
-    redirectUri: 'http://localhost:3000',
-    isSignedIn: true,
-    responseType: 'id_token',
-    onSuccess: handleSuccess,
-    onFailure: handleFailure,
-    onAutoLoadFinished: handleAutoLoadFinished,
-  });
-
-  const { signOut } = useGoogleLogout({
-    clientId,
-    onLogoutSuccess: handleLogoutSuccess,
-  });
-
   useEffect(() => {
-    set((store) => {
-      store.signIn = signIn;
-      store.signOut = signOut;
+    window.gapi.load('client:auth2', () => {
+      window.gapi.client
+        .init({
+          clientId,
+          scope: 'email',
+        })
+        .then(() => {
+          const auth = window.gapi.auth2.getAuthInstance();
+          if (auth.isSignedIn.get()) {
+            handleSignIn(auth.currentUser.get());
+          } else {
+            handleSignOut();
+          }
+          auth.currentUser.listen((user) => {
+            if (user.isSignedIn()) {
+              handleSignIn(user);
+            } else {
+              handleSignOut();
+            }
+          });
+          set((store) => {
+            store.signIn = auth.signIn;
+            store.signOut = auth.signOut;
+          });
+        })
+        .catch((e) => {
+          handleError(e);
+        });
     });
-  }, [set, signIn, signOut]);
+  }, [handleSignIn, handleSignOut, set]);
 };
