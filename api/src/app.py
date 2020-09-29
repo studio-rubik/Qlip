@@ -24,11 +24,14 @@ if not DSN:
 app.config["DSN"] = DSN
 
 
-app.config["ALLOWED_ORIGIN"] = os.getenv("ALLOWED_ORIGIN")
+app.config["ALLOWED_ORIGINS"] = os.getenv("ALLOWED_ORIGINS")
 if app.debug:
     origins = "*"
 else:
-    origins = app.config["ALLOWED_ORIGIN"]
+    allowed_origins = app.config["ALLOWED_ORIGINS"]
+    if not allowed_origins:
+        raise RuntimeError("ALLOWED_ORIGINS is required when debug == false")
+    origins = allowed_origins.split(" ")
 
 CORS(app, headers=["Authorization"], origins=origins)
 
