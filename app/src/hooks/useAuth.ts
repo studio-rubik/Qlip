@@ -14,7 +14,6 @@ export default () => {
 
   const handleSignIn = useCallback(
     (user: gapi.auth2.GoogleUser) => {
-      console.log(user.getAuthResponse().id_token);
       set((store) => {
         store.idToken = user.getAuthResponse().id_token;
       });
