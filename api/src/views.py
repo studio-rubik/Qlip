@@ -60,11 +60,14 @@ def files():
 @require_auth
 def components_post():
     file = request.files.get("file")
-    site, created = models.Website.get_or_create(
-        domain=request.form.get("domain"), name=""
-    )
+    name = request.form.get("name")
+    domain = request.form.get("domain")
+    width = request.form.get("originalWidth")
+    height = request.form.get("originalHeight")
+
+    site, created = models.Website.get_or_create(domain=domain, name="")
     comp = models.Component.create(
-        user_id=g.user.id, name=request.form.get("name"), website=site
+        user_id=g.user.id, name=name, width=width, height=height, website=site
     )
     comp_file = models.ComponentFile.create(key=comp.id, component=comp)
     comp_file.store_file(file)

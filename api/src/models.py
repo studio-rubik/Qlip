@@ -6,6 +6,7 @@ from peewee import (
     MySQLDatabase,
     Model,
     CharField,
+    DoubleField,
     UUIDField,
     DateTimeField,
     BooleanField,
@@ -73,8 +74,10 @@ class Website(BaseModel):
 
 class Component(BaseModel):
     name = CharField()
-    website = ForeignKeyField(Website, backref="component")
     user_id = CharField()
+    width = DoubleField()
+    height = DoubleField()
+    website = ForeignKeyField(Website, backref="component")
     tags = ManyToManyField(Tag, backref="components")
 
     @property
