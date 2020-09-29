@@ -111,6 +111,7 @@ type ComponentAddMsg = {
   // base64
   dataURL: string;
   domain: string;
+  originalSize: { width: number; height: number };
 };
 
 function handleCaptureMsg(
@@ -132,6 +133,8 @@ function handleCaptureMsg(
 async function componentAdd(msg: ComponentAddMsg, respond: any) {
   const fd = new FormData();
   fd.append('domain', msg.domain);
+  fd.append('originalWidth', msg.originalSize.width.toString());
+  fd.append('originalHeight', msg.originalSize.height.toString());
   fd.append('name', 'component_name');
   fd.append('file', await utils.dataUrlToFile(msg.dataURL, 'file'));
 

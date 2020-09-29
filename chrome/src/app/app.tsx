@@ -41,6 +41,7 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
         type: 'api.component.add',
         dataURL: imgURL,
         domain: window.location.hostname,
+        originalSize,
       },
       (resp) => {
         setSending(false);
