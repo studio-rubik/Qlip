@@ -6,7 +6,6 @@ from datetime import date
 
 
 app = Flask(__name__)
-CORS(app, headers=["Authorization"])
 
 app.config["AWS_S3_ENDPOINT_URL"] = os.getenv("AWS_S3_ENDPOINT_URL", None)
 app.config["AWS_S3_PUBLIC_URL"] = os.getenv("AWS_S3_PUBLIC_URL", None)
@@ -28,6 +27,13 @@ app.config["DSN"] = DSN
 app.config["FRONTEND_URL"] = os.getenv("FRONTEND_URL")
 if not app.config["FRONTEND_URL"]:
     raise RuntimeError("FRONTEND_URL is no set")
+
+if app.debug:
+    origins = "*"
+else:
+    origins = app.config["FRONTEND_URL"]
+
+CORS(app, headers=["Authorization"], origins=origins)
 
 
 class CustomJSONEncoder(JSONEncoder):
