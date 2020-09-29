@@ -72,6 +72,8 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
               src={imgURL}
               style={{
                 ...imgStyle,
+                width: originalSize.width,
+                height: originalSize.height,
               }}
             />
           </div>

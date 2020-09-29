@@ -122,7 +122,7 @@ function handleCaptureMsg(
       tab[0].windowId,
       { format: 'png' },
       (image) => {
-        crop(image, msg.area, msg.dpr, msg.dpr, 'png', (cropped) => {
+        crop(image, msg.area, msg.dpr, true, 'png', (cropped) => {
           res({ type: 'capture', data: cropped });
         });
       },
@@ -210,7 +210,7 @@ function crop(
   image: any,
   area: { x: number; y: number; w: number; h: number },
   dpr: number,
-  preserve: number,
+  preserve: boolean,
   format: string,
   callback: (data: string) => void,
 ) {

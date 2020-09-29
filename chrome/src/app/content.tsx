@@ -129,11 +129,12 @@ async function capture() {
     width: clientRect.width + MARGIN * 2,
     height: clientRect.height + MARGIN * 2,
   };
+  const dpr = window.devicePixelRatio;
   chrome.runtime.sendMessage(
     {
       type: 'capture.execute',
       area: { x: rect.x, y: rect.y, w: rect.width, h: rect.height },
-      dpr: devicePixelRatio,
+      dpr,
     },
     (res) => {
       if (selected == null) return;
@@ -142,7 +143,13 @@ async function capture() {
       if (reactRoot != null) {
         reactRoot.style.display = 'block';
       }
-      ReactDOM.render(<App imgURL={res.data} originalSize={rect} />, reactRoot);
+      ReactDOM.render(
+        <App
+          imgURL={res.data}
+          originalSize={{ height: rect.height, width: rect.width }}
+        />,
+        reactRoot,
+      );
     },
   );
 }
