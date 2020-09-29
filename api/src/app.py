@@ -24,14 +24,11 @@ if not DSN:
 app.config["DSN"] = DSN
 
 
-app.config["FRONTEND_URL"] = os.getenv("FRONTEND_URL")
-if not app.config["FRONTEND_URL"]:
-    raise RuntimeError("FRONTEND_URL is no set")
-
+app.config["ALLOWED_ORIGIN"] = os.getenv("ALLOWED_ORIGIN")
 if app.debug:
     origins = "*"
 else:
-    origins = app.config["FRONTEND_URL"]
+    origins = app.config["ALLOWED_ORIGIN"]
 
 CORS(app, headers=["Authorization"], origins=origins)
 
