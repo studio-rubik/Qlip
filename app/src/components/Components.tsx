@@ -33,7 +33,7 @@ const { confirm } = AntModal;
 
 const LIMIT = 50;
 const ROW_HEIGHT = 1;
-const ROW_GAP = 24;
+const ROW_GAP = 20;
 
 function resizeGridItem(
   gridItem: HTMLElement,
@@ -267,75 +267,71 @@ const Main = () => {
       />
       {loaded ? (
         <>
-          <CardsContainer>
-            <InfiniteScroll
-              dataLength={components.length}
-              next={fetchData}
-              hasMore={hasMore}
-              loader={
-                <SpinWrapper>
-                  <Spin />
-                </SpinWrapper>
-              }
-              endMessage={fetchedMore ? <EndMsg>EOF</EndMsg> : null}
-            >
-              {components.length > 0 ? (
-                <Cards className="grid">
-                  {components.map((comp) => (
-                    <GridItem className="grid-item" key={comp.id}>
-                      <Card
-                        hoverable
-                        cover={
-                          <CardImg
-                            src={
-                              files.find((f) => f.component === comp.id)?.url
+          <InfiniteScroll
+            dataLength={components.length}
+            next={fetchData}
+            hasMore={hasMore}
+            loader={
+              <SpinWrapper>
+                <Spin />
+              </SpinWrapper>
+            }
+            endMessage={fetchedMore ? <EndMsg>EOF</EndMsg> : null}
+          >
+            {components.length > 0 ? (
+              <Cards className="grid">
+                {components.map((comp) => (
+                  <GridItem className="grid-item" key={comp.id}>
+                    <Card
+                      hoverable
+                      cover={
+                        <CardImg
+                          src={files.find((f) => f.component === comp.id)?.url}
+                          onLoad={(e) =>
+                            resizeGridItemByCoverImg(e.currentTarget)
+                          }
+                          alt=""
+                        />
+                      }
+                      onClick={() => handleCardClick(comp.id)}
+                      bodyStyle={{ padding: 10 }}
+                    >
+                      <CardDomainRow>
+                        <div>
+                          <Icons.Globe />
+                          <CardDomainText>
+                            {
+                              websites.find((s) => s.id === comp.website)
+                                ?.domain
                             }
-                            onLoad={(e) =>
-                              resizeGridItemByCoverImg(e.currentTarget)
-                            }
-                            alt=""
-                          />
-                        }
-                        onClick={() => handleCardClick(comp.id)}
-                        bodyStyle={{ padding: 10 }}
-                      >
-                        <CardDomainRow>
-                          <div>
-                            <Icons.Globe />
-                            <CardDomainText>
-                              {
-                                websites.find((s) => s.id === comp.website)
-                                  ?.domain
-                              }
-                            </CardDomainText>
-                          </div>
-                          {tags.filter((t) => comp.tagIds.includes(t.id))
-                            .length === 0 ? (
-                            <MoreButton compID={comp.id} />
-                          ) : null}
-                        </CardDomainRow>
-                        {tags.filter((t) => comp.tagIds.includes(t.id)).length >
-                        0 ? (
-                          <TagRow>
-                            <div>
-                              {tags
-                                .filter((t) => comp.tagIds.includes(t.id))
-                                .map((t) => (
-                                  <Tag key={t.id}>{t.name}</Tag>
-                                ))}
-                            </div>
-                            <MoreButton compID={comp.id} />
-                          </TagRow>
+                          </CardDomainText>
+                        </div>
+                        {tags.filter((t) => comp.tagIds.includes(t.id))
+                          .length === 0 ? (
+                          <MoreButton compID={comp.id} />
                         ) : null}
-                      </Card>
-                    </GridItem>
-                  ))}
-                </Cards>
-              ) : loading ? null : (
-                <Empty description="No Component Found" />
-              )}
-            </InfiniteScroll>
-          </CardsContainer>
+                      </CardDomainRow>
+                      {tags.filter((t) => comp.tagIds.includes(t.id)).length >
+                      0 ? (
+                        <TagRow>
+                          <div>
+                            {tags
+                              .filter((t) => comp.tagIds.includes(t.id))
+                              .map((t) => (
+                                <Tag key={t.id}>{t.name}</Tag>
+                              ))}
+                          </div>
+                          <MoreButton compID={comp.id} />
+                        </TagRow>
+                      ) : null}
+                    </Card>
+                  </GridItem>
+                ))}
+              </Cards>
+            ) : loading ? null : (
+              <Empty description="No Component Found" />
+            )}
+          </InfiniteScroll>
           <Modal
             isOpen={modalOpen}
             onRequestClose={closeModal}
@@ -364,13 +360,8 @@ const ModalStyle: Modal.Styles = {
   overlay: { background: '#0008' },
 };
 
-const CardsContainer = styled.div`
-  padding: 8px;
-`;
-
 const Cards = styled.div`
-  min-height: 100vh;
-  padding: 12px;
+  padding: 20px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   grid-auto-rows: ${ROW_HEIGHT}px;
