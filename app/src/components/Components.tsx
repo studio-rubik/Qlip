@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-  Row,
-  Col,
   Card,
   Tag,
   Modal as AntModal,
@@ -33,7 +31,52 @@ import AuthButton from './AuthButton';
 
 const { confirm } = AntModal;
 
-const limit = 12;
+const LIMIT = 50;
+const ROW_HEIGHT = 1;
+const ROW_GAP = 24;
+
+function resizeGridItem(
+  gridItem: HTMLElement,
+  cover: HTMLElement,
+  body: HTMLElement,
+) {
+  const rowSpan = Math.ceil(
+    (cover.getBoundingClientRect().height +
+      body.getBoundingClientRect().height +
+      ROW_GAP) /
+      (ROW_HEIGHT + ROW_GAP),
+  );
+  gridItem.style.gridRowEnd = 'span ' + rowSpan;
+}
+
+function resizeGridItemByCoverImg(img: HTMLImageElement) {
+  const cover = img.parentElement;
+  const card = cover?.parentElement;
+  const gridItem = card?.parentElement;
+  const body = card?.querySelector('.ant-card-body');
+  if (
+    gridItem instanceof HTMLElement &&
+    cover instanceof HTMLElement &&
+    body instanceof HTMLElement
+  ) {
+    resizeGridItem(gridItem, cover, body);
+  }
+}
+
+async function resizeAllCards() {
+  const allItems = document.getElementsByClassName('grid-item');
+  for (const item of Array.from(allItems)) {
+    const cover = item.querySelector('.ant-card-cover img');
+    const body = item.querySelector('.ant-card-body');
+    if (
+      item instanceof HTMLElement &&
+      cover instanceof HTMLElement &&
+      body instanceof HTMLElement
+    ) {
+      resizeGridItem(item, cover, body);
+    }
+  }
+}
 
 const Main = () => {
   const token = useStore((store) => store.idToken);
@@ -70,6 +113,14 @@ const Main = () => {
   const [fetchedMore, setFetchedMore] = useState(false);
 
   useEffect(() => {
+    window.addEventListener('resize', resizeAllCards);
+  }, []);
+
+  useEffect(() => {
+    resizeAllCards();
+  }, [components]);
+
+  useEffect(() => {
     async function fn() {
       if (token) {
         // Re-initialize after url changed.
@@ -78,8 +129,8 @@ const Main = () => {
         setFetchedMore(false);
 
         try {
-          const hasMore = await fetchComponents({ limit, offset: 0 });
-          setOffset(limit);
+          const hasMore = await fetchComponents({ limit: LIMIT, offset: 0 });
+          setOffset(LIMIT);
           setHasMore(hasMore);
         } catch (e) {
           console.debug(e);
@@ -188,8 +239,8 @@ const Main = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const hasMore = await fetchComponents({ limit, offset }, false);
-      setOffset((prev) => prev + limit);
+      const hasMore = await fetchComponents({ limit: LIMIT, offset }, false);
+      setOffset((prev) => prev + LIMIT);
       setHasMore(hasMore);
     } catch (e) {
       console.debug(e);
@@ -229,15 +280,18 @@ const Main = () => {
               endMessage={fetchedMore ? <EndMsg>EOF</EndMsg> : null}
             >
               {components.length > 0 ? (
-                <Row gutter={[16, 16]} style={{ margin: 0 }}>
+                <Cards className="grid">
                   {components.map((comp) => (
-                    <Col xl={6} lg={8} md={12} sm={24} key={comp.id}>
+                    <GridItem className="grid-item" key={comp.id}>
                       <Card
                         hoverable
                         cover={
                           <CardImg
                             src={
                               files.find((f) => f.component === comp.id)?.url
+                            }
+                            onLoad={(e) =>
+                              resizeGridItemByCoverImg(e.currentTarget)
                             }
                             alt=""
                           />
@@ -274,9 +328,9 @@ const Main = () => {
                           </TagRow>
                         ) : null}
                       </Card>
-                    </Col>
+                    </GridItem>
                   ))}
-                </Row>
+                </Cards>
               ) : loading ? null : (
                 <Empty description="No Component Found" />
               )}
@@ -313,6 +367,17 @@ const ModalStyle: Modal.Styles = {
 const CardsContainer = styled.div`
   padding: 8px;
 `;
+
+const Cards = styled.div`
+  min-height: 100vh;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-auto-rows: ${ROW_HEIGHT}px;
+  grid-gap: ${ROW_GAP}px;
+`;
+
+const GridItem = styled.div``;
 
 const CardImg = styled.img`
   image-rendering: -webkit-optimize-contrast;
