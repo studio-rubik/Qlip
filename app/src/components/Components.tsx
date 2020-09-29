@@ -329,7 +329,9 @@ const Main = () => {
                 ))}
               </Cards>
             ) : loading ? null : (
-              <Empty description="No Component Found" />
+              <EmptyWrapper>
+                <Empty description="You have no item here" />
+              </EmptyWrapper>
             )}
           </InfiniteScroll>
           <Modal
@@ -412,6 +414,14 @@ const EndMsg = styled.p`
   margin-top: 50px;
   text-align: center;
   color: #999;
+`;
+
+const EmptyWrapper = styled.div`
+  width: 100%;
+  height: calc(100vh - 68px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default Main;
