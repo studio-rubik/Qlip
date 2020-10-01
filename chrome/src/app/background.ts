@@ -1,6 +1,7 @@
 import './hot-reload';
 
 import * as utils from './utils';
+import * as types from '../common/types';
 
 function publish(msg: any) {
   chrome.windows.getAll({ populate: true }, function (window_list) {
@@ -18,6 +19,7 @@ function publish(msg: any) {
 }
 
 let idToken = '';
+let mode: types.CaptureMode = 'clone';
 
 type SignInResponse = {
   data: {
@@ -160,6 +162,22 @@ async function componentAdd(msg: ComponentAddMsg, respond: any) {
   }
 }
 
+function toggleMode() {
+  mode = mode === 'clone' ? 'direct' : 'clone';
+  chrome.tabs.query({ active: true, currentWindow: true }, async (tab) => {
+    if (tab[0].id == null) return;
+    // Send parallel
+    chrome.tabs.sendMessage(tab[0].id, {
+      type: 'mode.toggle.request',
+      data: { value: mode },
+    });
+    chrome.runtime.sendMessage({
+      type: 'mode.toggle.complete',
+      data: { value: mode },
+    });
+  });
+}
+
 async function toggleCapture() {
   if (idToken === '') {
     await startSignInFlow();
@@ -187,6 +205,12 @@ chrome.runtime.onMessage.addListener((msg, _, respond) => {
       break;
     case 'idToken':
       fetchIdToken(respond);
+      break;
+    case 'mode.get':
+      respond({ data: { value: mode } });
+      break;
+    case 'mode.toggle.request':
+      toggleMode();
       break;
     case 'capture.toggle.request':
       toggleCapture();

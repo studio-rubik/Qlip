@@ -14,7 +14,7 @@ let keybindingsContent: HTMLUListElement | null = null;
 let savedOutline = '';
 let savedOffset = '';
 let savedZIndex = '';
-const mode: types.CaptureMode = 'clone';
+let mode: types.CaptureMode = 'clone';
 
 function createReactRoot() {
   const root = document.createElement('div');
@@ -78,12 +78,15 @@ function createKeybindings() {
 }
 
 function init() {
-  reactRoot = createReactRoot();
-  overlay = createOverlay();
-  keybindings = createKeybindings();
-  document.body.appendChild(reactRoot);
-  document.body.appendChild(overlay);
-  document.body.appendChild(keybindings);
+  chrome.runtime.sendMessage({ type: 'mode.get' }, (resp) => {
+    mode = resp.data.value;
+    reactRoot = createReactRoot();
+    overlay = createOverlay();
+    keybindings = createKeybindings();
+    document.body.appendChild(reactRoot);
+    document.body.appendChild(overlay);
+    document.body.appendChild(keybindings);
+  });
 }
 
 type OutlineStyles = {
@@ -248,6 +251,10 @@ function disableExtension() {
 
 chrome.runtime.onMessage.addListener((msg, _, respond) => {
   switch (msg.type) {
+    case 'mode.toggle.request':
+      mode = msg.data.value;
+      respond({ type: 'mode.toggle.complete', data: { value: mode } });
+      break;
     case 'capture.get':
       respond({ type: 'capture.get', data: { value: enabled } });
       break;

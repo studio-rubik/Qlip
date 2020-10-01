@@ -34,7 +34,8 @@
     "@types/react-modal": "^3.10.6",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-modal": "^3.11.2"
+    "react-modal": "^3.11.2",
+    "react-switch": "^5.0.1"
   },
   "eslintConfig": {
     "extends": "react-app"

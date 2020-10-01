@@ -1,5 +1,7 @@
 body {
-    min-width: 200px;
+    min-width: 250px;
+    color: #666;
+    font-size: 14px;
 }
 
 .container {
@@ -9,24 +11,55 @@ body {
     padding: 5px;
 }
 
-.capture {
+.divider {
+    height: 1px;
+    width: 100%;
+    background: #bbb;
+}
+
+.title {
+    text-align: center;
+    font-weight: bolder;
+}
+
+.actions {
+}
+
+.actions .row{
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
 }
 
 .keybinding {
-    color: #666;
-    font-size: 14px;
     vertical-align: middle;
     line-height: 14px;
-    padding: 0 10px;
+}
+
+.options {
+    padding-top: 10px;
+}
+
+.options .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    vertical-align: middle;
+    line-height: 30px;
 }
 
 .open-showcase {
-    margin-top: 12px;
     text-align: center;
+    margin-top: 10px;
 }
 
 .open-showcase a {
+    color: #666;
     text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    padding: 6px;
+    border-radius: 4px;
+    border: solid 1px #888;
 }
