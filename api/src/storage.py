@@ -19,5 +19,14 @@ def store_file(file, key: str, bucket_name: str):
         raise
 
 
+def delete_file(key: str, bucket_name: str):
+    bucket = s3.Bucket(bucket_name)
+    print(key)
+    try:
+        bucket.delete_objects(Delete={"Objects": [{"Key": key}]})
+    except Boto3Error:
+        raise
+
+
 def build_public_link(key: str, bucket_name: str):
     return f"{app.config['AWS_S3_PUBLIC_URL']}/{bucket_name}/{key}"

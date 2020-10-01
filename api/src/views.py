@@ -120,6 +120,7 @@ def components_delete(id: str):
     if component.user_id != g.user.id:
         abort(403)
     models.ComponentTag.delete().where(models.ComponentTag.component == id).execute()
+    component.file.first().delete_file()
     component.delete_by_id(id)
     return {}, 200
 

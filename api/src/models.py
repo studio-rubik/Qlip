@@ -56,6 +56,11 @@ class File(BaseModel):
 
         storage.store_file(file, str(self.key), self.bucket)
 
+    def delete_file(self):
+        from . import storage
+
+        storage.delete_file(str(self.key), self.bucket)
+
 
 class User(BaseModel):
     name = CharField()
