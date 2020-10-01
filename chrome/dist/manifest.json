@@ -22,7 +22,8 @@
     "activeTab",
     "activeTabs",
     "identity",
-    "identity.email"
+    "identity.email",
+    "storage"
   ],
   "content_security_policy": "default-src 'self'; style-src 'self' data: 'unsafe-inline'; img-src data:; connect-src data: http: https:;",
   "oauth2": {

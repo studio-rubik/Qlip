@@ -21,7 +21,7 @@ if (navigator.appVersion.indexOf('Mac') != -1) {
 const App: React.FC = () => {
   const [idToken, setIdToken] = useState('');
   const [enabled, setEnabled] = useState(false);
-  const [mode, setMode] = useState<types.CaptureMode>('clone');
+  const [mode, setMode] = useState<types.CaptureMode>('direct');
   const [margin, setMargin] = useState(0);
   const [sending, setSending] = useState(false);
 

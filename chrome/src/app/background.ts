@@ -19,8 +19,8 @@ function publish(msg: any) {
 }
 
 let idToken = '';
-let mode: types.CaptureMode = 'direct';
-let margin = 0;
+let captureMode: types.CaptureMode = 'direct';
+let margin = 20;
 
 type SignInResponse = {
   data: {
@@ -164,23 +164,26 @@ async function componentAdd(msg: ComponentAddMsg, respond: any) {
 }
 
 function toggleMode() {
-  mode = mode === 'clone' ? 'direct' : 'clone';
+  captureMode = captureMode === 'clone' ? 'direct' : 'clone';
+  chrome.storage.sync.set({ captureMode: captureMode });
+
   chrome.tabs.query({ active: true, currentWindow: true }, async (tab) => {
     if (tab[0].id == null) return;
     // Send parallel
     chrome.tabs.sendMessage(tab[0].id, {
       type: 'mode.toggle.request',
-      data: { value: mode },
+      data: { value: captureMode },
     });
     chrome.runtime.sendMessage({
       type: 'mode.toggle.complete',
-      data: { value: mode },
+      data: { value: captureMode },
     });
   });
 }
 
 function setMargin(msg: any) {
   margin = msg.data.value;
+  chrome.storage.sync.set({ margin });
   chrome.tabs.query({ active: true, currentWindow: true }, async (tab) => {
     if (tab[0].id == null) return;
     // Send parallel
@@ -224,7 +227,7 @@ chrome.runtime.onMessage.addListener((msg, _, respond) => {
       fetchIdToken(respond);
       break;
     case 'mode.get':
-      respond({ data: { value: mode } });
+      respond({ data: { value: captureMode } });
       break;
     case 'mode.toggle.request':
       toggleMode();
@@ -285,3 +288,13 @@ function crop(
   };
   img.src = image;
 }
+
+function init() {
+  chrome.storage.sync.get(({ captureMode: cMode, margin: mar }) => {
+    console.log(cMode, mar);
+    captureMode = cMode;
+    margin = mar;
+  });
+}
+
+init();
