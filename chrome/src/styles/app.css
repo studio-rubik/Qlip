@@ -40,13 +40,17 @@
 #dc-keybindings ul {
     padding: 0;
     margin: 0;
-    list-style: none;
+    list-style-type: none;
 }
 
 #dc-keybindings li {
     margin: 0;
     padding: 4px;
     line-height: 26px;
+}
+
+#dc-keybindings li::before {
+    content: none;
 }
 
 .dc-key-action {
