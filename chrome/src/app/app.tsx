@@ -112,8 +112,9 @@ const App: React.FC<Props> = ({ target }) => {
         shouldCloseOnOverlayClick={true}
       >
         <div style={containerStyle}>
-          <div style={imgOverlayStyle}>
-            <div style={imgStyle} ref={ref}></div>
+          <div style={imgWrapperStyle}>
+            <div style={imgStyle} ref={ref} />
+            <div style={imgOverlayStyle} />
           </div>
           <div>
             <IconButton
@@ -139,10 +140,21 @@ const containerStyle: CSSProperties = {
   flexDirection: 'column',
   alignItems: 'center',
   padding: '30px 10px',
+  zIndex: 9999999,
+};
+
+const imgWrapperStyle: CSSProperties = {
+  position: 'relative',
+  flex: 1,
 };
 
 const imgOverlayStyle: CSSProperties = {
-  flex: 1,
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  height: '100%',
+  width: '100%',
+  zIndex: 99999999,
 };
 
 const imgStyle: CSSProperties = {
