@@ -89,6 +89,18 @@ const App: React.FC = () => {
 
   const keybinding = `[${isMac ? '\u2318' : 'Ctrl'} Shift S]`;
 
+  const helpFactory = (text: string) => {
+    return (
+      <Tooltip
+        placement="top"
+        trigger={['hover']}
+        overlay={<span>{text}</span>}
+      >
+        <img src="/img/help.png" alt="help" width={14} height={14} />
+      </Tooltip>
+    );
+  };
+
   return (
     <div className="container">
       {idToken === '' ? (
@@ -113,11 +125,19 @@ const App: React.FC = () => {
           <div className="options">
             <div className="title">Options</div>
             <div className="row">
-              <span className="description">Include background</span>
+              <div className="description">
+                {helpFactory(
+                  'Recommend "ON" to capture items as you see. Turn off to ignore other elements than focused one, but some elements like iframe and white charters won\'t be captured.',
+                )}
+                <div>Include background</div>
+              </div>
               <Switch onClick={handleModeChange} checked={mode === 'direct'} />
             </div>
             <div className="row">
-              <span className="description">Margin</span>
+              <div className="description">
+                {helpFactory('Margin in pixels to add around focused element.')}
+                <div>Margin</div>
+              </div>
               <div className="input">
                 <Slider
                   min={0}
