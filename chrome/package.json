@@ -32,6 +32,9 @@
   },
   "dependencies": {
     "@types/react-modal": "^3.10.6",
+    "rc-slider": "^9.5.1",
+    "rc-switch": "^3.2.1",
+    "rc-tooltip": "^4.2.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-modal": "^3.11.2",

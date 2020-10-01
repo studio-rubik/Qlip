@@ -22,6 +22,10 @@ body {
     font-weight: bolder;
 }
 
+.row {
+    height: 30px;
+}
+
 .actions {
 }
 
@@ -44,9 +48,19 @@ body {
 .options .row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 12px 0;
-    vertical-align: middle;
-    line-height: 30px;
+}
+
+.options .row .description {
+    display: inline-block;
+}
+
+
+.options .row .input {
+    display: inline-block;
+    padding-left: 22px;
+    flex: 1;
 }
 
 .open-showcase {

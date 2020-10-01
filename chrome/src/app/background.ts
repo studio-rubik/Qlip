@@ -19,7 +19,8 @@ function publish(msg: any) {
 }
 
 let idToken = '';
-let mode: types.CaptureMode = 'clone';
+let mode: types.CaptureMode = 'direct';
+let margin = 0;
 
 type SignInResponse = {
   data: {
@@ -178,6 +179,22 @@ function toggleMode() {
   });
 }
 
+function setMargin(msg: any) {
+  margin = msg.data.value;
+  chrome.tabs.query({ active: true, currentWindow: true }, async (tab) => {
+    if (tab[0].id == null) return;
+    // Send parallel
+    chrome.tabs.sendMessage(tab[0].id, {
+      type: 'margin.set.request',
+      data: { value: margin },
+    });
+    chrome.runtime.sendMessage({
+      type: 'margin.set.complete',
+      data: { value: margin },
+    });
+  });
+}
+
 async function toggleCapture() {
   if (idToken === '') {
     await startSignInFlow();
@@ -211,6 +228,12 @@ chrome.runtime.onMessage.addListener((msg, _, respond) => {
       break;
     case 'mode.toggle.request':
       toggleMode();
+      break;
+    case 'margin.get':
+      respond({ data: { value: margin } });
+      break;
+    case 'margin.set.request':
+      setMargin(msg);
       break;
     case 'capture.toggle.request':
       toggleCapture();

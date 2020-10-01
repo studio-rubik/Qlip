@@ -15,6 +15,7 @@ let savedOutline = '';
 let savedOffset = '';
 let savedZIndex = '';
 let mode: types.CaptureMode = 'clone';
+let margin = 0;
 
 function createReactRoot() {
   const root = document.createElement('div');
@@ -78,14 +79,17 @@ function createKeybindings() {
 }
 
 function init() {
-  chrome.runtime.sendMessage({ type: 'mode.get' }, (resp) => {
-    mode = resp.data.value;
-    reactRoot = createReactRoot();
-    overlay = createOverlay();
-    keybindings = createKeybindings();
-    document.body.appendChild(reactRoot);
-    document.body.appendChild(overlay);
-    document.body.appendChild(keybindings);
+  chrome.runtime.sendMessage({ type: 'mode.get' }, (modeResp) => {
+    chrome.runtime.sendMessage({ type: 'margin.get' }, (marginResp) => {
+      mode = modeResp.data.value;
+      margin = marginResp.data.value;
+      reactRoot = createReactRoot();
+      overlay = createOverlay();
+      keybindings = createKeybindings();
+      document.body.appendChild(reactRoot);
+      document.body.appendChild(overlay);
+      document.body.appendChild(keybindings);
+    });
   });
 }
 
@@ -132,7 +136,7 @@ async function capture() {
   if (mode === 'clone') {
     preview = target;
   } else {
-    const resp = await utils.captureDOM(target);
+    const resp = await utils.captureDOM(target, { margin });
     preview = resp.dataURL;
     originalSize = resp.originalSize;
   }
@@ -141,7 +145,7 @@ async function capture() {
     reactRoot.style.display = 'block';
   }
   ReactDOM.render(
-    <App preview={preview} originalSize={originalSize} />,
+    <App preview={preview} originalSize={originalSize} margin={margin} />,
     reactRoot,
   );
 }
@@ -254,6 +258,10 @@ chrome.runtime.onMessage.addListener((msg, _, respond) => {
     case 'mode.toggle.request':
       mode = msg.data.value;
       respond({ type: 'mode.toggle.complete', data: { value: mode } });
+      break;
+    case 'margin.set.request':
+      margin = msg.data.value;
+      respond({ type: 'margin.set.complete', data: { value: mode } });
       break;
     case 'capture.get':
       respond({ type: 'capture.get', data: { value: enabled } });

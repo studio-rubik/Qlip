@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import Switch from 'react-switch';
+import Switch from 'rc-switch';
+import Slider from 'rc-slider';
+import Tooltip from 'rc-tooltip';
+import 'rc-switch/assets/index.css';
+import 'rc-slider/assets/index.css';
+import 'rc-tooltip/assets/bootstrap.css';
 
 import '../styles/common.css';
 import '../styles/popup.css';
@@ -17,6 +22,7 @@ const App: React.FC = () => {
   const [idToken, setIdToken] = useState('');
   const [enabled, setEnabled] = useState(false);
   const [mode, setMode] = useState<types.CaptureMode>('clone');
+  const [margin, setMargin] = useState(0);
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
@@ -25,6 +31,8 @@ const App: React.FC = () => {
         window.close();
       } else if (msg.type === 'mode.toggle.complete') {
         setMode(msg.data.value);
+      } else if (msg.type === 'margin.set.complete') {
+        setMargin(msg.data.value);
       }
     });
     chrome.runtime.sendMessage({ type: 'idToken' }, (resp) => {
@@ -32,6 +40,9 @@ const App: React.FC = () => {
     });
     chrome.runtime.sendMessage({ type: 'mode.get' }, (resp) => {
       setMode(resp.data.value);
+    });
+    chrome.runtime.sendMessage({ type: 'margin.get' }, (resp) => {
+      setMargin(resp.data.value);
     });
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0].id == null) return;
@@ -63,6 +74,15 @@ const App: React.FC = () => {
     });
   };
 
+  const handleMarginChange = (value: number) => {
+    chrome.runtime.sendMessage(
+      { type: 'margin.set.request', data: { value } },
+      (resp) => {
+        setMargin(resp.data.value);
+      },
+    );
+  };
+
   const keybinding = `[${isMac ? '\u2318' : 'Ctrl'} Shift S]`;
 
   return (
@@ -89,20 +109,20 @@ const App: React.FC = () => {
           <div className="options">
             <div className="title">Options</div>
             <div className="row">
-              <span>Include background</span>
-              <Switch
-                onChange={handleModeChange}
-                checked={mode === 'direct'}
-                onColor="#86d3ff"
-                onHandleColor="#2693e6"
-                handleDiameter={25}
-                uncheckedIcon={false}
-                checkedIcon={false}
-                boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                activeBoxShadow="0px 0px 1px 5px rgba(0, 0, 0, 0.2)"
-                height={20}
-                width={42}
-              />
+              <span className="description">Include background</span>
+              <Switch onClick={handleModeChange} checked={mode === 'direct'} />
+            </div>
+            <div className="row">
+              <span className="description">Margin</span>
+              <div className="input">
+                <Slider
+                  min={0}
+                  max={50}
+                  onChange={handleMarginChange}
+                  value={margin}
+                  handle={handle}
+                />
+              </div>
             </div>
           </div>
           <div className="open-showcase">
@@ -113,6 +133,21 @@ const App: React.FC = () => {
         </>
       ) : null}
     </div>
+  );
+};
+
+const handle = (props: any) => {
+  const { value, dragging, index, ...restProps } = props;
+  return (
+    <Tooltip
+      prefixCls="rc-slider-tooltip"
+      overlay={value}
+      visible={dragging}
+      placement="top"
+      key={index}
+    >
+      <Slider.Handle value={value} {...restProps} />
+    </Tooltip>
   );
 };
 

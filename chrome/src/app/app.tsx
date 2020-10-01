@@ -5,15 +5,15 @@ import Modal from 'react-modal';
 import '../styles/common.css';
 import '../styles/app.css';
 import * as utils from '../common/utils';
-import Button from '../components/Button';
 import IconButton from '../components/IconButton';
 
 type Props = {
   preview: HTMLElement | string;
   originalSize?: { width: number; height: number };
+  margin?: number;
 };
 
-const App: React.FC<Props> = ({ preview, originalSize }) => {
+const App: React.FC<Props> = ({ preview, originalSize, margin }) => {
   const clonedWrapperRef = useRef<HTMLDivElement | null>(null);
   const clonedRef = useRef<HTMLElement | null>(null);
   const [sending, setSending] = useState(false);
@@ -62,7 +62,7 @@ const App: React.FC<Props> = ({ preview, originalSize }) => {
     let origSize = { width: 0, height: 0 };
     if (preview instanceof HTMLElement) {
       if (clonedRef.current == null) return;
-      const resp = await utils.captureDOM(clonedRef.current);
+      const resp = await utils.captureDOM(clonedRef.current, { margin });
       dataURL = resp.dataURL;
       origSize = resp.originalSize;
     } else {
