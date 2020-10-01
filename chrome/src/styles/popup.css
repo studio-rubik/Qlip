@@ -1,5 +1,6 @@
 body {
     min-width: 250px;
+    min-height: 280px;
     color: #666;
     font-size: 14px;
 }
