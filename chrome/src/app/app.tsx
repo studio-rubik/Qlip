@@ -132,7 +132,7 @@ const App: React.FC<Props> = ({ preview, originalSize }) => {
               />
             )}
           </div>
-          <div>
+          <div style={buttonRowStyle}>
             <IconButton
               loading={sending}
               src={chrome.runtime.getURL('/img/upload.png')}
@@ -155,11 +155,11 @@ const containerStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  padding: '30px 10px',
   zIndex: 9999999,
 };
 
 const imgWrapperStyle: CSSProperties = {
+  padding: '30px 0',
   position: 'relative',
   flex: 1,
 };
@@ -175,7 +175,10 @@ const imgOverlayStyle: CSSProperties = {
 
 const imgStyle: CSSProperties = {
   maxWidth: '100%',
-  marginBottom: 50,
+};
+
+const buttonRowStyle: CSSProperties = {
+  marginBottom: 30,
 };
 
 const errorStyle: CSSProperties = {
