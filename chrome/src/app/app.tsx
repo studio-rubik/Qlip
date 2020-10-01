@@ -4,16 +4,17 @@ import Modal from 'react-modal';
 
 import '../styles/common.css';
 import '../styles/app.css';
+import * as utils from '../common/utils';
 import IconButton from '../components/IconButton';
 
 type Props = {
-  target: HTMLElement;
+  preview: HTMLElement | string;
+  originalSize?: { width: number; height: number };
 };
 
-const MARGIN = 0;
-
-const App: React.FC<Props> = ({ target }) => {
-  const ref = useRef<HTMLDivElement | null>(null);
+const App: React.FC<Props> = ({ preview, originalSize }) => {
+  const clonedWrapperRef = useRef<HTMLDivElement | null>(null);
+  const clonedRef = useRef<HTMLElement | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<boolean>(false);
   const [initialized, initialize] = useState(false);
@@ -23,17 +24,20 @@ const App: React.FC<Props> = ({ target }) => {
   }, []);
 
   useEffect(() => {
-    // Force call this effect once again to ensure target.current is not null.
-    if (!initialized) {
-      initialize(true);
+    if (preview instanceof HTMLElement) {
+      // Force call this effect once again to ensure target.current is not null.
+      if (!initialized) {
+        initialize(true);
+      }
+      const elm = utils.clone(preview) as HTMLElement;
+      if (['absolute', 'fixed'].includes(elm.style.position)) {
+        elm.style.position = 'static';
+      }
+      // Prevent overflow but respect `width` if smaller than container's width.
+      elm.style.maxWidth = '100%';
+      clonedRef.current = elm;
+      clonedWrapperRef.current?.appendChild(elm);
     }
-
-    if (['absolute', 'fixed'].includes(target.style.position)) {
-      target.style.position = 'static';
-    }
-    // Prevent overflow but respect `width` if smaller than container's width.
-    target.style.maxWidth = '100%';
-    ref.current?.appendChild(target);
   }, [initialized]);
 
   useEffect(() => {
@@ -53,37 +57,36 @@ const App: React.FC<Props> = ({ target }) => {
 
   const handleUploadClick = async () => {
     setSending(true);
-    const clientRect = target.getBoundingClientRect();
-    const rect = {
-      x: clientRect.x - MARGIN,
-      y: clientRect.y - MARGIN,
-      width: clientRect.width + MARGIN * 2,
-      height: clientRect.height + MARGIN * 2,
-    };
-    const dpr = window.devicePixelRatio;
+    let dataURL = '';
+    let origSize = { width: 0, height: 0 };
+    if (preview instanceof HTMLElement) {
+      if (clonedRef.current == null) return;
+      const resp = await utils.captureDOM(clonedRef.current);
+      dataURL = resp.dataURL;
+      origSize = resp.originalSize;
+    } else {
+      dataURL = preview;
+      if (originalSize) {
+        origSize = originalSize;
+      }
+    }
     chrome.runtime.sendMessage(
       {
-        type: 'capture.execute',
-        area: { x: rect.x, y: rect.y, w: rect.width, h: rect.height },
-        dpr,
+        type: 'api.component.add',
+        dataURL: dataURL,
+        domain: window.location.hostname,
+        originalSize: {
+          width: origSize.width,
+          height: origSize.height,
+        },
       },
       (resp) => {
-        chrome.runtime.sendMessage(
-          {
-            type: 'api.component.add',
-            dataURL: resp.data,
-            domain: window.location.hostname,
-            originalSize: { width: rect.width, height: rect.height },
-          },
-          (resp) => {
-            setSending(false);
-            if (resp.data.value === true) {
-              close();
-            } else {
-              setError(true);
-            }
-          },
-        );
+        setSending(false);
+        if (resp.data.value === true) {
+          close();
+        } else {
+          setError(true);
+        }
       },
     );
   };
@@ -113,8 +116,21 @@ const App: React.FC<Props> = ({ target }) => {
       >
         <div style={containerStyle}>
           <div style={imgWrapperStyle}>
-            <div style={imgStyle} ref={ref} />
-            <div style={imgOverlayStyle} />
+            {preview instanceof HTMLElement ? (
+              <>
+                <div style={imgStyle} ref={clonedWrapperRef} />
+                <div style={imgOverlayStyle} />
+              </>
+            ) : (
+              <img
+                src={preview}
+                style={{
+                  ...imgStyle,
+                  width: originalSize?.width,
+                  height: originalSize?.height,
+                }}
+              />
+            )}
           </div>
           <div>
             <IconButton

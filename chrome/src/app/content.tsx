@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import * as types from '../common/types';
+import * as utils from '../common/utils';
 import App from './app';
-
-type CaptureMode = 'clone' | 'direct';
 
 let selected: HTMLElement | null = null;
 let reactRoot: HTMLDivElement | null = null;
@@ -14,7 +14,7 @@ let keybindingsContent: HTMLUListElement | null = null;
 let savedOutline = '';
 let savedOffset = '';
 let savedZIndex = '';
-const mode: CaptureMode = 'clone';
+const mode: types.CaptureMode = 'clone';
 
 function createReactRoot() {
   const root = document.createElement('div');
@@ -111,21 +111,6 @@ function tilStyleApplied(
   });
 }
 
-function clone(node: Node) {
-  if (node instanceof HTMLIFrameElement) {
-    console.debug("can't clone iframe.");
-  }
-  const cloned = node.cloneNode(false);
-  if (node instanceof HTMLElement) {
-    const style = window.getComputedStyle(node as HTMLElement);
-    (cloned as HTMLElement).style.cssText = style.cssText;
-  }
-  for (const c of Array.from(node.childNodes)) {
-    cloned.appendChild(clone(c));
-  }
-  return cloned;
-}
-
 async function capture() {
   if (selected == null) return;
   const target = selected;
@@ -138,12 +123,22 @@ async function capture() {
     outlineOffset: savedOffset,
     zIndex: savedZIndex,
   });
+
+  let preview: HTMLElement | string;
+  let originalSize: { width: number; height: number } | undefined = undefined;
+  if (mode === 'clone') {
+    preview = target;
+  } else {
+    const resp = await utils.captureDOM(target);
+    preview = resp.dataURL;
+    originalSize = resp.originalSize;
+  }
   disableExtension();
   if (reactRoot != null) {
     reactRoot.style.display = 'block';
   }
   ReactDOM.render(
-    <App target={(mode === 'clone' ? clone(target) : target) as HTMLElement} />,
+    <App preview={preview} originalSize={originalSize} />,
     reactRoot,
   );
 }
