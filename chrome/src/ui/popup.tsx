@@ -68,15 +68,19 @@ const App: React.FC = () => {
     window.open('https://app.qlip.page', '_blank')?.focus();
   };
 
-  const handleModeChange = (checked: boolean) => {
+  const handleModeChange = () => {
     chrome.runtime.sendMessage({ type: 'mode.toggle.request' }, (resp) => {
       setMode(resp.data.value);
     });
   };
 
   const handleMarginChange = (value: number) => {
+    setMargin(value);
+  };
+
+  const handleMarginChangeCommit = () => {
     chrome.runtime.sendMessage(
-      { type: 'margin.set.request', data: { value } },
+      { type: 'margin.set.request', data: { value: margin } },
       (resp) => {
         setMargin(resp.data.value);
       },
@@ -119,6 +123,7 @@ const App: React.FC = () => {
                   min={0}
                   max={50}
                   onChange={handleMarginChange}
+                  onAfterChange={handleMarginChangeCommit}
                   value={margin}
                   handle={handle}
                 />
