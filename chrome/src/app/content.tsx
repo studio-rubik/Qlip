@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import App from './app';
 
-const MARGIN = 20;
+type CaptureMode = 'clone' | 'direct';
 
 let selected: HTMLElement | null = null;
 let reactRoot: HTMLDivElement | null = null;
@@ -14,6 +14,7 @@ let keybindingsContent: HTMLUListElement | null = null;
 let savedOutline = '';
 let savedOffset = '';
 let savedZIndex = '';
+const mode: CaptureMode = 'clone';
 
 function createReactRoot() {
   const root = document.createElement('div');
@@ -110,6 +111,21 @@ function tilStyleApplied(
   });
 }
 
+function clone(node: Node) {
+  if (node instanceof HTMLIFrameElement) {
+    console.debug("can't clone iframe.");
+  }
+  const cloned = node.cloneNode(false);
+  if (node instanceof HTMLElement) {
+    const style = window.getComputedStyle(node as HTMLElement);
+    (cloned as HTMLElement).style.cssText = style.cssText;
+  }
+  for (const c of Array.from(node.childNodes)) {
+    cloned.appendChild(clone(c));
+  }
+  return cloned;
+}
+
 async function capture() {
   if (selected == null) return;
   const target = selected;
@@ -122,35 +138,13 @@ async function capture() {
     outlineOffset: savedOffset,
     zIndex: savedZIndex,
   });
-  const clientRect = target.getBoundingClientRect();
-  const rect = {
-    x: clientRect.x - MARGIN,
-    y: clientRect.y - MARGIN,
-    width: clientRect.width + MARGIN * 2,
-    height: clientRect.height + MARGIN * 2,
-  };
-  const dpr = window.devicePixelRatio;
-  chrome.runtime.sendMessage(
-    {
-      type: 'capture.execute',
-      area: { x: rect.x, y: rect.y, w: rect.width, h: rect.height },
-      dpr,
-    },
-    (res) => {
-      if (selected == null) return;
-      enabled = false;
-      disableExtension();
-      if (reactRoot != null) {
-        reactRoot.style.display = 'block';
-      }
-      ReactDOM.render(
-        <App
-          imgURL={res.data}
-          originalSize={{ height: rect.height, width: rect.width }}
-        />,
-        reactRoot,
-      );
-    },
+  disableExtension();
+  if (reactRoot != null) {
+    reactRoot.style.display = 'block';
+  }
+  ReactDOM.render(
+    <App target={(mode === 'clone' ? clone(target) : target) as HTMLElement} />,
+    reactRoot,
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useState } from 'react';
+import React, { CSSProperties, useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
 
@@ -7,17 +7,34 @@ import '../styles/app.css';
 import IconButton from '../components/IconButton';
 
 type Props = {
-  imgURL: string;
-  originalSize: { height: number; width: number };
+  target: HTMLElement;
 };
 
-const App: React.FC<Props> = ({ imgURL, originalSize }) => {
+const MARGIN = 0;
+
+const App: React.FC<Props> = ({ target }) => {
+  const ref = useRef<HTMLDivElement | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<boolean>(false);
+  const [initialized, initialize] = useState(false);
 
   useEffect(() => {
     Modal.setAppElement('#dc-root');
   }, []);
+
+  useEffect(() => {
+    // Force call this effect once again to ensure target.current is not null.
+    if (!initialized) {
+      initialize(true);
+    }
+
+    if (['absolute', 'fixed'].includes(target.style.position)) {
+      target.style.position = 'static';
+    }
+    // Prevent overflow but respect `width` if smaller than container's width.
+    target.style.maxWidth = '100%';
+    ref.current?.appendChild(target);
+  }, [initialized]);
 
   useEffect(() => {
     return () => {
@@ -36,20 +53,37 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
 
   const handleUploadClick = async () => {
     setSending(true);
+    const clientRect = target.getBoundingClientRect();
+    const rect = {
+      x: clientRect.x - MARGIN,
+      y: clientRect.y - MARGIN,
+      width: clientRect.width + MARGIN * 2,
+      height: clientRect.height + MARGIN * 2,
+    };
+    const dpr = window.devicePixelRatio;
     chrome.runtime.sendMessage(
       {
-        type: 'api.component.add',
-        dataURL: imgURL,
-        domain: window.location.hostname,
-        originalSize,
+        type: 'capture.execute',
+        area: { x: rect.x, y: rect.y, w: rect.width, h: rect.height },
+        dpr,
       },
       (resp) => {
-        setSending(false);
-        if (resp.data.value === true) {
-          close();
-        } else {
-          setError(true);
-        }
+        chrome.runtime.sendMessage(
+          {
+            type: 'api.component.add',
+            dataURL: resp.data,
+            domain: window.location.hostname,
+            originalSize: { width: rect.width, height: rect.height },
+          },
+          (resp) => {
+            setSending(false);
+            if (resp.data.value === true) {
+              close();
+            } else {
+              setError(true);
+            }
+          },
+        );
       },
     );
   };
@@ -60,7 +94,17 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
         style={{
           // padding: 20px is added only when content overflows.
           // Override it to always padding: 20px by containerStyle.
-          content: { width: '90vw', padding: 0 },
+          content: {
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            border: 'none',
+            width: '100%',
+            height: '100vh',
+            padding: 0,
+            borderRadius: 0,
+          },
           overlay: { backgroundColor: '#0008', zIndex: 99999999 },
         }}
         isOpen={true}
@@ -68,15 +112,8 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
         shouldCloseOnOverlayClick={true}
       >
         <div style={containerStyle}>
-          <div>
-            <img
-              src={imgURL}
-              style={{
-                ...imgStyle,
-                width: originalSize.width,
-                height: originalSize.height,
-              }}
-            />
+          <div style={imgOverlayStyle}>
+            <div style={imgStyle} ref={ref}></div>
           </div>
           <div>
             <IconButton
@@ -97,15 +134,19 @@ const App: React.FC<Props> = ({ imgURL, originalSize }) => {
 };
 
 const containerStyle: CSSProperties = {
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  padding: 20,
+  padding: '30px 10px',
+};
+
+const imgOverlayStyle: CSSProperties = {
+  flex: 1,
 };
 
 const imgStyle: CSSProperties = {
   maxWidth: '100%',
-  maxHeight: '70vh',
   marginBottom: 50,
 };
 
