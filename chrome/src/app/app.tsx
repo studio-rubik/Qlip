@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 import '../styles/common.css';
 import '../styles/app.css';
 import * as utils from '../common/utils';
+import Button from '../components/Button';
 import IconButton from '../components/IconButton';
 
 type Props = {
@@ -134,6 +135,14 @@ const App: React.FC<Props> = ({ preview, originalSize }) => {
           </div>
           <div style={buttonRowStyle}>
             <IconButton
+              src={chrome.runtime.getURL('/img/cancel.png')}
+              danger
+              onClick={close}
+              style={{ marginRight: 50 }}
+            >
+              Cancel
+            </IconButton>
+            <IconButton
               loading={sending}
               src={chrome.runtime.getURL('/img/upload.png')}
               onClick={handleUploadClick}
@@ -178,6 +187,8 @@ const imgStyle: CSSProperties = {
 };
 
 const buttonRowStyle: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'center',
   marginBottom: 30,
 };
 

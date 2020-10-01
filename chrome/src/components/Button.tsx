@@ -2,9 +2,11 @@ import React, { useState, CSSProperties, MouseEventHandler } from 'react';
 
 type Props = {
   onClick: MouseEventHandler;
+  danger?: boolean;
+  style?: CSSProperties;
 };
 
-const Button: React.FC<Props> = ({ children, onClick }) => {
+const Button: React.FC<Props> = ({ children, onClick, danger, style }) => {
   const [hover, setHover] = useState(false);
 
   const handleMouseOver = () => {
@@ -17,7 +19,12 @@ const Button: React.FC<Props> = ({ children, onClick }) => {
 
   return (
     <button
-      style={{ ...buttonStyle, color: hover ? '#111' : '#666' }}
+      style={{
+        ...buttonStyle,
+        color: hover ? '#111' : '#666',
+        borderColor: danger ? '#f25246' : undefined,
+        ...style,
+      }}
       onClick={onClick}
       onMouseOver={handleMouseOver}
       onMouseLeave={handleMouseLeave}

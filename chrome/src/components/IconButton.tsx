@@ -15,16 +15,20 @@ type Props = {
   loading?: boolean;
   onClick: MouseEventHandler;
   src: string;
+  danger?: boolean;
+  style?: CSSProperties;
 };
 
 const IconButton: React.FC<Props> = ({
   loading = false,
   onClick,
   src,
+  danger,
+  style,
   children,
 }) => {
   return (
-    <Button onClick={onClick}>
+    <Button onClick={onClick} danger={danger} style={style}>
       {loading ? (
         <Spinner />
       ) : (
