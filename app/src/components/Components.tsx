@@ -31,7 +31,7 @@ import AuthButton from './AuthButton';
 
 const { confirm } = AntModal;
 
-const LIMIT = 50;
+const LIMIT = 30;
 const ROW_HEIGHT = 1;
 const ROW_GAP = 20;
 
