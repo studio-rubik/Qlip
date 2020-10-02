@@ -165,8 +165,8 @@ const Main = () => {
     );
     if (id == null)
       return titleFactory(
-        <Icons.List style={{ color: color.primary }} />,
-        'All Components',
+        <Icons.Clock style={{ color: color.primary }} />,
+        'Latest',
       );
     return queries.get('tag') != null
       ? titleFactory(
