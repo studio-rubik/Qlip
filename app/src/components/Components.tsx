@@ -80,6 +80,7 @@ async function resizeAllCards() {
 
 const Main = () => {
   const token = useStore((store) => store.idToken);
+  const created = useStore((store) => store.created);
   const components = useStore((store) =>
     store.components.allIds.map((id) => store.components.byId[id]),
   );
@@ -140,7 +141,7 @@ const Main = () => {
       }
     }
     fn();
-  }, [fetchComponents, token]);
+  }, [fetchComponents, token, created]);
 
   const handleCardClick = (componentID: string) => {
     setSelectedComponentID(componentID);

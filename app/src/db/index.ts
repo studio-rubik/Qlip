@@ -8,8 +8,8 @@ export default class ServerRepository implements Repository {
     this.client = new Http(host, port);
   }
 
-  test() {
-    return this.client.get({ path: '' });
+  login() {
+    return this.client.get({ path: 'login' });
   }
 
   componentsFilter(queries: ComponentsFilterQueries) {

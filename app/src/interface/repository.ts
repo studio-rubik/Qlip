@@ -29,7 +29,7 @@ type TagPostResp = APIResponse<{ tag: any }>;
 type WebsitesAllResp = APIResponse<{ websites: APIResponseEntity<any> }>;
 
 export default interface Repository {
-  test(): Promise<string>;
+  login(): Promise<APIResponse<{ created: boolean }>>;
   componentsFilter(
     params: ComponentsFilterQueries,
   ): Promise<ComponentsFilterResp>;

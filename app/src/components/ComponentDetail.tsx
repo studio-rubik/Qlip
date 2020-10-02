@@ -231,7 +231,7 @@ const DetailImgWrapper = styled.div`
 
 const DetailImg = styled.img`
   display: inline-block;
-  border-radius: 10px;
+  image-rendering: -webkit-optimize-contrast;
 `;
 
 export default ComponentDetail;
