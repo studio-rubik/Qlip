@@ -1,6 +1,8 @@
-.ant-menu-item-selected div {
-  color: white;
+.ant-layout-sider .ant-menu-inline .ant-menu-item {
+  margin-top: 0;
+  margin-bottom: 0; 
 }
+
 
 .ant-card-bordered {
   border-radius: 10px;

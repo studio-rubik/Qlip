@@ -20,7 +20,7 @@ import { ReactComponent as LogoIcon } from '../parts/logo-icon.svg';
 import { ReactComponent as LogoText } from '../parts/logo-text.svg';
 import Icons from './Icons';
 
-const LOGO_HEIGHT = 44;
+const LOGO_HEIGHT = 68;
 
 function SideNavigation() {
   const repo = useRepository();
@@ -69,7 +69,7 @@ function SideNavigation() {
             fetchComponents({ limit: 10, offset: 0 });
             fetchTags();
           } catch (e) {
-            console.log(e);
+            console.debug(e);
           }
         },
       });
@@ -96,6 +96,7 @@ function SideNavigation() {
           height: '100vh',
           position: 'fixed',
           left: 0,
+          borderRight: '1px solid #ddd',
         }}
         className="site-layout-background"
       >
@@ -106,7 +107,7 @@ function SideNavigation() {
           </LogoWrapper>
         </Link>
         <Menu
-          theme="dark"
+          theme="light"
           mode="inline"
           defaultOpenKeys={['tag']}
           selectedKeys={selectedMenuItem ? [selectedMenuItem] : undefined}
@@ -178,10 +179,12 @@ const LogoWrapper = styled.div`
   padding: 8px;
   display: flex;
   align-items: center;
+  background: white;
+  box-shadow: 0 1px 3px -2px rgba(0, 0, 0, 0.6);
 `;
 
 const StyledLogoIcon = styled(LogoIcon)`
-  margin-left: 38px;
+  margin-left: 48px;
   display: block;
   height: 17px;
   width: 34px;
@@ -202,11 +205,11 @@ const MenuItemContent = styled.div`
 
 const MenuItemText = styled.div`
   position: relative;
-  color: rgba(255, 255, 255, 0.65);
+  color: #333;
   width: 100%;
 
   ${MenuItemContent}:hover & {
-    color: white;
+    color: #1890ff;
   }
 `;
 
@@ -226,7 +229,7 @@ const MoreButton = styled.div`
   }
 
   &:hover {
-    background: #3d3d3d;
+    background: #0002;
   }
 `;
 
