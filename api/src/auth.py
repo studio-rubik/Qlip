@@ -1,4 +1,6 @@
 from functools import wraps
+import os
+import json
 from flask import request, g
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -6,6 +8,7 @@ from google.auth.transport import requests
 from .exceptions import AuthError
 from .domain import User
 from .app import app
+from . import models
 
 ALGORITHMS = ["RS256"]
 
@@ -64,8 +67,11 @@ def require_auth(f):
                 app.config["GOOGLE_CHROME_CLIENT_ID"],
             ]:
                 raise ValueError("Could not verify audience.")
-            userid = idinfo["sub"]
-            g.user = User(id=userid)
+            user_id = idinfo["sub"]
+            email = idinfo["email"]
+            # `name` is None when id token is sent from chrome.
+            name = idinfo.get("name")
+            g.user = User(id=user_id, email=email, name=name)
         except ValueError as e:
             print(e)
             raise AuthError(error="Invalid token", status_code=401)

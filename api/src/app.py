@@ -24,6 +24,11 @@ if not DSN:
 app.config["DSN"] = DSN
 
 
+app.config["EXAMPLE_DIR"] = os.getenv("EXAMPLE_DIR")
+if not app.config["EXAMPLE_DIR"]:
+    raise RuntimeError("EXAMPLE_DIR is not set")
+
+
 app.config["ALLOWED_ORIGINS"] = os.getenv("ALLOWED_ORIGINS")
 if app.debug:
     origins = "*"

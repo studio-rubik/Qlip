@@ -64,6 +64,8 @@ class File(BaseModel):
 
 class User(BaseModel):
     name = CharField()
+    email = CharField()
+    google_id = CharField()
 
 
 class Tag(BaseModel):

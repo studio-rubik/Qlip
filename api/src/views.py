@@ -1,4 +1,6 @@
 import typing
+import os
+import json
 from flask import request, abort, g
 
 from .app import app
@@ -35,17 +37,50 @@ def after_request(response):
     return response
 
 
-@app.route("/", methods=["GET"])
+def create_user():
+    tag_names = [
+        "example",
+        "sign-in",
+        "search",
+        "menu",
+        "mobile",
+        "illustration",
+        "dashboard",
+    ]
+
+    with open(os.path.join(app.config["EXAMPLE_DIR"], "components.json"), "rb") as file:
+        components = json.loads(file.read().decode("utf-8"))
+
+    models.User.create(google_id=g.user.id, name=g.user.name, email=g.user.email)
+    tags = [models.Tag.create(name=name, user_id=g.user.id) for name in tag_names]
+
+    for c in components:
+        site, created = models.Website.get_or_create(domain=c["domain"], name="")
+        comp = models.Component.create(
+            user_id=g.user.id,
+            name="",
+            width=c["width"],
+            height=c["height"],
+            website=site,
+        )
+        comp.tags.add([t for t in tags if t.name in c["tags"] or t.name == "example"])
+        comp_file = models.ComponentFile.create(key=comp.id, component=comp)
+        with open(
+            os.path.join(app.config["EXAMPLE_DIR"], "files", c["file"]), "rb"
+        ) as file:
+            comp_file.store_file(file)
+
+
+@app.route("/login", methods=["GET"])
 @require_auth
-def test_auth():
-    return {}, 200
+def login():
+    user = models.User.get_or_none(models.User.google_id == g.user.id)
+    created = False
+    if user is None:
+        create_user()
+        created = True
 
-
-@app.route("/users", methods=["POST"])
-def users():
-    req = request.get_json()
-    user = models.User.create(name=req.get("name"))
-    return {"id": user.id, "name": user.name}, 200
+    return {"data": {"created": created}}, 200
 
 
 @app.route("/files", methods=["POST"])
