@@ -96,6 +96,7 @@ function SideNavigation() {
           height: '100vh',
           position: 'fixed',
           left: 0,
+          boxShadow: '1px 0px 3px -2px rgba(0, 0, 0, 0.4)',
         }}
         className="site-layout-background"
       >
