@@ -137,7 +137,7 @@ const ComponentDetail: React.FC<Props> = ({
       <Divider />
       <Row align="middle" gutter={[0, 24]} style={{ color: '#666' }}>
         <Icons.Clock style={iconStyle} />
-        {fromUTC.toRelative(component.updatedAt)}
+        {fromUTC.toDate(component.updatedAt)}
       </Row>
       <Row align="middle">
         <Icons.Globe style={iconStyle} />
