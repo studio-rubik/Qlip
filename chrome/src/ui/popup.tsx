@@ -24,6 +24,7 @@ const App: React.FC = () => {
   const [mode, setMode] = useState<types.CaptureMode>('direct');
   const [margin, setMargin] = useState(0);
   const [sending, setSending] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener((msg) => {
@@ -37,6 +38,7 @@ const App: React.FC = () => {
     });
     chrome.runtime.sendMessage({ type: 'idToken' }, (resp) => {
       setIdToken(resp.data.idToken);
+      setLoading(false);
     });
     chrome.runtime.sendMessage({ type: 'mode.get' }, (resp) => {
       setMode(resp.data.value);
@@ -100,6 +102,8 @@ const App: React.FC = () => {
       </Tooltip>
     );
   };
+
+  if (loading) return <span>Loading...</span>;
 
   return (
     <div className="container">
