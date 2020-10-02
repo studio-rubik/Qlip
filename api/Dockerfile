@@ -1,6 +1,7 @@
 FROM python:3.8.2-buster
 
 ADD src/ /opt/api/src
+ADD example/ /opt/api/example
 ADD requirements.txt /opt/api
 ADD create_tables.py /opt/api
 WORKDIR /opt/api
