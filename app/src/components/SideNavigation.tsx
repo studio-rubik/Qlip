@@ -96,7 +96,6 @@ function SideNavigation() {
           height: '100vh',
           position: 'fixed',
           left: 0,
-          borderRight: '1px solid #ddd',
         }}
         className="site-layout-background"
       >
@@ -112,7 +111,7 @@ function SideNavigation() {
           defaultOpenKeys={['tag']}
           selectedKeys={selectedMenuItem ? [selectedMenuItem] : undefined}
           onSelect={handleSelect}
-          style={{ height: `calc(100% - ${LOGO_HEIGHT}px)`, borderRight: 0 }}
+          style={{ height: `calc(100% - ${LOGO_HEIGHT}px)` }}
         >
           <Menu.SubMenu
             key="tag"
@@ -180,7 +179,7 @@ const LogoWrapper = styled.div`
   display: flex;
   align-items: center;
   background: white;
-  box-shadow: 0 1px 3px -2px rgba(0, 0, 0, 0.6);
+  border-right: 1px solid #f0f0f0;
 `;
 
 const StyledLogoIcon = styled(LogoIcon)`
