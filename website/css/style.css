@@ -926,6 +926,14 @@ section#subscribe {
   color: rgba(255, 255, 255, 0.9);
 }
 
+.footer p {
+  font-size: 16px;
+}
+
+.footer .credit a {
+  color: #77b7e7;
+}
+
 /******************
     Features
 *******************/
