@@ -186,15 +186,15 @@ const LogoWrapper = styled.div`
 const StyledLogoIcon = styled(LogoIcon)`
   margin-left: 48px;
   display: block;
-  height: 17px;
-  width: 34px;
+  height: 26px;
+  width: 26px;
 `;
 
 const StyledLogoText = styled(LogoText)`
   display: block;
   height: 28px;
   width: 48px;
-  padding: 4px 0 0 8px;
+  margin: 2px 0 0 8px;
 `;
 
 const MenuItemContent = styled.div`
