@@ -24,7 +24,7 @@ function App() {
 
   return (
     <>
-      <Helmet titleTemplate="%s - Qlip" defaultTitle="Qlip Showcase" />
+      <Helmet titleTemplate="%s - Qlip" defaultTitle="Qlip Scrapbook" />
       {authLoaded ? (
         <Layout>
           <SideNavigation />
